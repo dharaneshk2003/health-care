@@ -105,7 +105,7 @@ export default function UserBookingForm({ doctor }) {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 mt-4">
           <h1 className="text-2xl font-bold mb-6">Book Your Appointment</h1>
           <form className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
