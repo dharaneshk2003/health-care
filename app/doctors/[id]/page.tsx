@@ -1,7 +1,6 @@
 import React from 'react'
 import { getDataWithId } from '../../backend.ts';
-import BookingForm from '../../../components/BookingForm.tsx';
-
+import UserBookingForm from '../../../components/UserBookingForm.tsx';
 export default async function DoctorDetailsPage({ params }: { params: { id: string } }){
     const { id } = await params;
     const doctor = await getDataWithId(id);
@@ -13,7 +12,7 @@ export default async function DoctorDetailsPage({ params }: { params: { id: stri
 
     <div>
       {/* {JSON.stringify(doctor)} */}
-      <BookingForm doctor={doctor}/>
+      <UserBookingForm doctor={doctor}/>
     </div>
   )
 }

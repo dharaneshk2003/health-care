@@ -13,6 +13,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
+import doctorIMg from "@/components/Images/doctor.png"
 
 export default function UserBookingForm({ doctor }) {
   const router = useRouter()
@@ -22,16 +24,19 @@ export default function UserBookingForm({ doctor }) {
   const [notes, setNotes] = useState<string>("")
   const [appointmentType, setAppointmentType] = useState<string>("new")
   const [showMap, setShowMap] = useState(true)
+
+
   if (!doctor) {
     return <div>Doctor not found</div>
   }
-  const { id, doctor_name, department, ratings, experience, consultation_fees, address, location, available_from_time, available_to_time,available_days } = doctor;
+  const { id, doctor_name, department, ratings, experience, consultation_fees, address, location, available_from_time, available_to_time, available_days, image_url } = doctor;
 
   const dummyDoctor = {
     id,
     name: doctor_name,
     specialization: department,
     consultationFee: consultation_fees,
+    image_url: image_url || doctorIMg, // Fallback image
   }
 
   const dummyHospital = {
@@ -44,26 +49,18 @@ export default function UserBookingForm({ doctor }) {
     const slots = [];
     const [fromHours, fromMinutes] = fromTime.split(':').map(Number);
     const [toHours, toMinutes] = toTime.split(':').map(Number);
-
     let current = new Date();
     current.setHours(fromHours, fromMinutes, 0, 0);
-
     const end = new Date();
     end.setHours(toHours, toMinutes, 0, 0);
-
     while (current <= end) {
       let hours = current.getHours();
       let minutes = current.getMinutes();
       let ampm = hours >= 12 ? 'PM' : 'AM';
-
-      // Convert to 12-hour format
       hours = hours % 12;
       hours = hours === 0 ? 12 : hours;
       const minutesStr = minutes < 10 ? '0' + minutes : minutes;
-
       slots.push(`${hours}:${minutesStr} ${ampm}`);
-
-      // Add 30 minutes
       current.setMinutes(current.getMinutes() + 30);
     }
 
@@ -86,6 +83,25 @@ export default function UserBookingForm({ doctor }) {
   }
 
   const availableDays = available_days;
+
+  const handleSubmit = async () => {
+  if (!date || !timeSlot || !isValidReferral()) {
+    alert("Please fill all required fields correctly.");
+    return;
+  }
+
+  const dataToSend = {
+    date: format(date, "yyyy-MM-dd"),
+    timeSlot,
+    referralId,
+    notes,
+    appointmentType,
+    doctorId: id,
+  };
+
+  router.push(`/doctors/${id}/payment`);
+};
+
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -193,22 +209,15 @@ export default function UserBookingForm({ doctor }) {
                 onChange={(e) => setNotes(e.target.value)}
               />
             </div>
-
             <Button
               type="button"
               className="w-full bg-custom hover:bg-secondary"
               disabled={!date || !timeSlot || !isValidReferral()}
-              onClick={() => {
-                if (!date || !timeSlot || !isValidReferral()) {
-                  alert("Please fill all required fields correctly.")
-                  return
-                }
-                // Proceed to payment or next step
-                router.push(`/doctors/${id}/payment`);
-              }}
+              onClick={handleSubmit}
             >
               Proceed to Payment
             </Button>
+
           </form>
         </div>
 
@@ -218,26 +227,40 @@ export default function UserBookingForm({ doctor }) {
               <CardTitle>Appointment Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <h3 className="font-semibold">{dummyDoctor.name}</h3>
-                <p className="text-sm text-muted-foreground">{dummyDoctor.specialization}</p>
+              <div className="flex justify-between gap-4">
+                {/* Doctor Details (Left Side) */}
+                <div className="flex-1 space-y-2">
+                  <h3 className="font-semibold">{dummyDoctor.name}</h3>
+                  <p className="text-sm text-muted-foreground">{dummyDoctor.specialization}</p>
+
+                  <div className="space-y-1 text-sm mt-4">
+                    <div className="flex items-center">
+                      <User className="h-4 w-4 mr-2 text-muted-foreground" />
+                      <span>ID: {dummyDoctor.id}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
+                      <span>{date ? format(date, "PPP") : "Select a date"}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+                      <span>{timeSlot || "Select a time slot"}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Doctor Image (Right Side) */}
+                <div className="w-28 h-28 flex-shrink-0 mr-5">
+                  <img
+                    src={dummyDoctor.image_url}
+                    alt={dummyDoctor.name || "Doctor"}
+                    className="rounded-md object-contain w-[130px] h-[123px] border-2 border-custom"
+                    priority
+                  />
+                </div>
               </div>
 
-              <div className="space-y-1 text-sm">
-                <div className="flex items-center">
-                  <User className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>ID: {dummyDoctor.id}</span>
-                </div>
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>{date ? format(date, "PPP") : "Select a date"}</span>
-                </div>
-                <div className="flex items-center">
-                  <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>{timeSlot || "Select a time slot"}</span>
-                </div>
-              </div>
-
+              {/* Fees and Total */}
               <div className="pt-4 border-t">
                 <div className="flex justify-between mb-2">
                   <span>Consultation Fee</span>
@@ -260,6 +283,7 @@ export default function UserBookingForm({ doctor }) {
                 <p>* Cancellation policy applies</p>
               </div>
             </CardContent>
+
           </Card>
           <Card>
             <CardHeader className="pb-2">
@@ -297,3 +321,5 @@ export default function UserBookingForm({ doctor }) {
     </div>
   )
 }
+
+
