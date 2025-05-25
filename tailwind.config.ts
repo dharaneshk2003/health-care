@@ -1,3 +1,4 @@
+import {heroui} from '@heroui/theme';
 import type { Config } from "tailwindcss";
 
 const config = {
@@ -7,6 +8,7 @@ const config = {
     "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
+    "./node_modules/@heroui/theme/dist/components/(date-input|form).js"
   ],
   prefix: "",
   theme: {
@@ -52,6 +54,9 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // ✅ Custom color added here
+        custom : "#bd1818",
+        
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -74,7 +79,7 @@ const config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"),heroui()],
 } satisfies Config;
 
 export default config;
