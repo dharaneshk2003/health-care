@@ -1,14 +1,27 @@
-// app/page.tsx or pages/index.tsx
-import WalletSection from "@/components/WalletSection";
-import BankSection from "@/components/BankSection";
-import CardSection from "@/components/CardSection";
+import React from 'react'
+import { createClient } from "../../utils/supabase/server";
 
-export default function PaymentPage() {
+
+export default async function DataRetrival() {
+  const supabase = await createClient();
+
+  const { data: doctors, error } = await supabase
+    .from('doctors')
+    .select('*');
+
+    console.log("doctors data : ",doctors);
+
+  let { data: patients } = await supabase
+  .from('patients')
+  .select('*')
+
+  console.log("patients data : ",patients[1])
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-10 space-y-6">
-      <WalletSection />
-      <BankSection />
-      <CardSection />
+    <div className="p-10">
+      <div className="border border-primary p-5">
+        hii
+      </div>
+      
     </div>
-  );
+  )
 }
