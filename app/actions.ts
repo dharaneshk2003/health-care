@@ -37,7 +37,7 @@ export const signUpAction = async (formData: FormData) => {
   return encodedRedirect(
     "success",
     "/sign-up",
-    "Thanks for signing up! Please check your email for a verification link."
+    "Thanks for signing up! Please check your email for a verification link. after verified your email, you can close this tab and sign in with your account."
   );
 };
 
@@ -76,7 +76,16 @@ export const signInAction = async (formData: FormData) => {
     );
   }
 
-  return redirect("/protected");
+  // If everything is fine, redirect to the protected route
+
+
+
+  if (userRole === "doctor") {
+    return redirect("/protected/");
+  } else if (userRole === "patient") {
+    return redirect("/doctors");
+  }
+  return redirect("/"); // Default redirect if no specific role match
 };
 
 
