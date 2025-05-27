@@ -146,7 +146,7 @@ export default function UserBookingForm({ doctor }) {
                       key={slot}
                       type="button"
                       variant={timeSlot === slot ? "default" : "outline"}
-                      className={`text-xs ${timeSlot === slot ? "bg-custom hover:bg-custom" : ""}`}
+                      className={`text-xs ${timeSlot === slot ? "bg-primary text-white hover:bg-primary hover:text-white" : ""}`}
                       onClick={() => setTimeSlot(slot)}
                     >
                       {slot}
@@ -175,10 +175,10 @@ export default function UserBookingForm({ doctor }) {
                 placeholder="Enter referral ID (e.g., 12345re)"
                 value={referralId}
                 onChange={(e) => setReferralId(e.target.value)}
-                className={!isValidReferral() ? "border-custom" : ""}
+                className={!isValidReferral() ? "border-primary" : ""}
               />
               {!isValidReferral() && (
-                <p className="text-xs text-custom">Invalid format. Use 5 digits followed by "re"</p>
+                <p className="text-xs text-white">Invalid format. Use 5 digits followed by "re"</p>
               )}
             </div>
 
@@ -186,7 +186,7 @@ export default function UserBookingForm({ doctor }) {
               <Label htmlFor="type">Appointment Type</Label>
               <RadioGroup value={appointmentType} onValueChange={setAppointmentType} className="flex flex-col space-y-1">
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="new" id="new" />
+                  <RadioGroupItem value="new" id="new" className=""/>
                   <Label htmlFor="new">New Consultation</Label>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -211,7 +211,7 @@ export default function UserBookingForm({ doctor }) {
             </div>
             <Button
               type="button"
-              className="w-full bg-custom hover:bg-secondary"
+              className="w-full bg-primary text-white hover:bg-red-500"
               disabled={!date || !timeSlot || !isValidReferral()}
               onClick={handleSubmit}
             >
@@ -254,7 +254,7 @@ export default function UserBookingForm({ doctor }) {
                   <img
                     src={dummyDoctor.image_url}
                     alt={dummyDoctor.name || "Doctor"}
-                    className="rounded-md object-contain w-[130px] h-[123px] border-2 border-custom"
+                    className="rounded-md object-contain w-[130px] h-[123px] border-2 border-primary"
                     priority
                   />
                 </div>

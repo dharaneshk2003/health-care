@@ -1,8 +1,8 @@
 // app/privacy-security/page.tsx or pages/privacy-security.tsx
 
 import { Metadata } from "next";
-import { Card, CardContent } from "../../../components/ui/card.tsx"; // shadcn/ui component
-import { Separator } from "../../../components/ui/separator.tsx"; // shadcn/ui component
+import { Card, CardContent } from "../../../components/ui/card"; // shadcn/ui component
+import { Separator } from "../../../components/ui/separator"; // shadcn/ui component
 
 export const metadata: Metadata = {
   title: "Data Privacy and Security | Hind Svaasth Seva",
@@ -15,7 +15,7 @@ export default function PrivacySecurityPage() {
     <main className="max-w-3xl mx-auto px-4 py-12">
       <Card>
         <CardContent className="py-8">
-          <h1 className="text-3xl font-bold mb-4 text-custom">
+          <h1 className="text-3xl font-bold mb-4 text-white">
             Data Privacy and Security at Hind Svaasth Seva
           </h1>
           <p className="text-muted-foreground mb-6">
@@ -74,12 +74,12 @@ export default function PrivacySecurityPage() {
           </ol>
           <Separator className="my-8" />
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-custom">Our Commitment to You</h2>
+            <h2 className="text-xl font-bold text-white">Our Commitment to You</h2>
             <p>
               At Hind Svaasth Seva, we prioritize the privacy and security of your data. By implementing these best practices, we aim to build trust and ensure that your personal information is protected. We are dedicated to providing a secure and user-friendly experience for all our patients.
             </p>
             <p>
-              If you have any questions or concerns about our data privacy practices, please do not hesitate to <a href="/contact" className="text-custom underline hover:text-custom/80">contact us</a>. Your trust is our top priority.
+              If you have any questions or concerns about our data privacy practices, please do not hesitate to <a href="/contact" className="text-white underline hover:text-white/80">contact us</a>. Your trust is our top priority.
             </p>
             <p>
               By following these best practices, we ensure that your data is handled with the utmost care and security. Thank you for choosing Hind Svaasth Seva for your healthcare needs.

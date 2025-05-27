@@ -23,7 +23,7 @@ export default function SignUpUserSteps() {
           <p className="mt-4">
             You will need to{" "}
             <Link
-              className="text-primary hover:text-foreground"
+              className="text-white hover:text-foreground"
               href={
                 "https://supabase.com/dashboard/project/_/auth/url-configuration"
               }
@@ -52,7 +52,7 @@ export default function SignUpUserSteps() {
               </span>{" "}
               (Vercel Team URL can be found in{" "}
               <Link
-                className="text-primary hover:text-foreground"
+                className="text-white hover:text-foreground"
                 href="https://vercel.com/docs/accounts/create-a-team#find-your-team-id"
                 target="_blank"
               >
@@ -64,7 +64,7 @@ export default function SignUpUserSteps() {
           <Link
             href="https://supabase.com/docs/guides/auth/redirect-urls#vercel-preview-urls"
             target="_blank"
-            className="text-primary/50 hover:text-primary flex items-center text-sm gap-1 mt-4"
+            className="text-white/50 hover:text-white flex items-center text-sm gap-1 mt-4"
           >
             Redirect URLs Docs <ArrowUpRight size={14} />
           </Link>

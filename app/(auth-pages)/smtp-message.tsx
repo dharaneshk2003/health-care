@@ -7,14 +7,14 @@ export function SmtpMessage() {
       <InfoIcon size={16} className="mt-0.5" />
       <div className="flex flex-col gap-1">
         <small className="text-sm text-secondary-foreground">
-          <strong> Note:</strong> Emails are rate limited. Enable Custom SMTP to
+          <strong> Note:</strong> Emails are rate limited. Enable primary SMTP to
           increase the rate limit.
         </small>
         <div>
           <Link
             href="https://supabase.com/docs/guides/auth/auth-smtp"
             target="_blank"
-            className="text-primary/50 hover:text-primary flex items-center text-sm gap-1"
+            className="text-white/50 hover:text-white flex items-center text-sm gap-1"
           >
             Learn more <ArrowUpRight size={14} />
           </Link>

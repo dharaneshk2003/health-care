@@ -17,7 +17,7 @@ export default function AboutPage() {
         <CardContent className="space-y-8">
           {/* Header */}
           <section>
-            <h1 className="text-4xl font-bold text-custom mb-4">
+            <h1 className="text-4xl font-bold text-white mb-4">
               What is Hind Svaasth Seva?
             </h1>
             <h2 className="text-2xl font-semibold mb-6">
@@ -32,7 +32,7 @@ export default function AboutPage() {
 
           {/* Why Choose Hind Svaasth Seva */}
           <section>
-            <h2 className="text-3xl font-semibold text-custom mb-6">
+            <h2 className="text-3xl font-semibold text-white mb-6">
               Why Choose Hind Svaasth Seva?
             </h2>
             <ul className="list-disc list-inside space-y-4 text-muted-foreground">
@@ -52,13 +52,13 @@ export default function AboutPage() {
 
           {/* Why Hind Svaasth Seva Stands Out */}
           <section>
-            <h2 className="text-3xl font-semibold text-custom mb-6">
+            <h2 className="text-3xl font-semibold text-white mb-6">
               Why Hind Svaasth Seva Stands Out
             </h2>
             <ul className="list-disc list-inside space-y-4 text-muted-foreground">
               <li><strong>First Come, First Served:</strong> We operate on a first-come, first-served basis, ensuring fairness and transparency. The earlier you book, the better your chances of securing your preferred time slot.</li>
               <li><strong>No hidden charges involved</strong></li>
-              <li><strong>Customer-Centric Approach:</strong> We prioritize your convenience and satisfaction. Our platform is designed to make healthcare accessible and hassle-free.</li>
+              <li><strong>primaryer-Centric Approach:</strong> We prioritize your convenience and satisfaction. Our platform is designed to make healthcare accessible and hassle-free.</li>
             </ul>
           </section>
 
@@ -66,7 +66,7 @@ export default function AboutPage() {
 
           {/* FAQs */}
           <section>
-            <h2 className="text-3xl font-semibold text-custom mb-6">Frequently Asked Questions</h2>
+            <h2 className="text-3xl font-semibold text-white mb-6">Frequently Asked Questions</h2>
             <dl className="space-y-6 text-muted-foreground">
               <div>
                 <dt className="font-semibold">What mode of payments are accepted by Hind Svaasth Seva?</dt>
@@ -83,7 +83,7 @@ export default function AboutPage() {
               <div>
                 <dt className="font-semibold">What if I have a problem accessing the site?</dt>
                 <dd className="mt-1">
-                  Proceed to the <Link href="/contact" className="text-custom underline hover:text-custom/80">contact page</Link> and your query will be resolved.
+                  Proceed to the <Link href="/contact" className="text-white underline hover:text-white/80">contact page</Link> and your query will be resolved.
                 </dd>
               </div>
             </dl>
@@ -93,7 +93,7 @@ export default function AboutPage() {
 
           {/* For Healthcare Centres */}
           <section>
-            <h2 className="text-3xl font-semibold text-custom mb-6">
+            <h2 className="text-3xl font-semibold text-white mb-6">
               Why Hind Svaasth Seva is good for my healthcare centre?
             </h2>
             <ul className="list-disc list-inside space-y-4 text-muted-foreground">
@@ -116,14 +116,14 @@ export default function AboutPage() {
 
           {/* Partnering Up */}
           <section>
-            <h2 className="text-3xl font-semibold text-custom mb-6">
+            <h2 className="text-3xl font-semibold text-white mb-6">
               How do I partner up with Hind Svaasth Seva?
             </h2>
             <p className="text-muted-foreground mb-4">
-              Don’t hesitate to contact us from the <Link href="/contact" className="text-custom underline hover:text-custom/80">contact page</Link>. We will help you out with the entire process of onboarding. You are just a call away.
+              Don’t hesitate to contact us from the <Link href="/contact" className="text-white underline hover:text-white/80">contact page</Link>. We will help you out with the entire process of onboarding. You are just a call away.
             </p>
 
-            <h2 className="text-3xl font-semibold text-custom mb-4">
+            <h2 className="text-3xl font-semibold text-white mb-4">
               How will I as a partner get my payouts?
             </h2>
             <p className="text-muted-foreground">

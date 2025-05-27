@@ -22,7 +22,7 @@ export default function DoctorCard({ doctors }) {
                     <CardHeader className="pl-3 pb-1 pt-3">
                         <div className="flex mt-2">
                             <CardTitle className="text-2xl">{doctor.doctor_name}</CardTitle>
-                            <span className="text-sm ml-4 mt-1 bg-custom text-white border border-custom-700 rounded-full h-6  px-2">
+                            <span className="text-sm ml-4 mt-1 bg-primary text-white rounded-full h-6 px-2 pt-0.5">
                                 ID : {doctor.id}
                             </span>
                         </div>
@@ -66,7 +66,7 @@ export default function DoctorCard({ doctors }) {
                         <p className="mx-0 font-bold text-lg mt-1">Consultation Fee : {doctor.consultation_fees}</p>
                     </CardContent>
                     <CardFooter className="pt-2">
-                        <Button className="bg-custom mt-0 hover:bg-red-500" onClick={()=> router.push(`/doctors/${doctor.id}`)}>Book Appointment</Button>
+                        <Button className="bg-primary text-white mt-0 hover:bg-red-500 hover:text-white" onClick={()=> router.push(`/doctors/${doctor.id}`)}>Book Appointment</Button>
                     </CardFooter>
                 </Card>
             ))}

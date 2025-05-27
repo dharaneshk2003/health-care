@@ -62,8 +62,8 @@ export function UserCategoryFilters({ onFilterChange }: UserCategoryFiltersProps
               variant={activeCategory === category.id ? "default" : "outline"}
               className={`rounded-full text-sm ${
                 activeCategory === category.id
-                  ? "bg-custom text-white"
-                  : "text-foreground hover:bg-custom/10 hover:text-primary"
+                  ? "bg-primary text-white"
+                  : "text-foreground hover:bg-primary/10 hover:text-white"
               }`}
               onClick={() => handleCategoryClick(category.id)}
             >

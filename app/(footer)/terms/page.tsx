@@ -13,7 +13,7 @@ export default function TermsPage() {
     <main className="max-w-3xl mx-auto px-4 py-12">
       <Card>
         <CardContent className="py-8 space-y-8">
-          <h1 className="text-3xl font-bold text-custom pb-0">
+          <h1 className="text-3xl font-bold text-white pb-0">
             Terms and Conditions
           </h1>
           <p className="text-muted-foreground mb-4">
@@ -44,7 +44,7 @@ export default function TermsPage() {
                   Refunds and cancellations are subject to our{" "}
                   <Link
                     href="/refund-cancellation"
-                    className="text-custom underline hover:text-custom/80"
+                    className="text-white underline hover:text-white/80"
                   >
                     refund and cancellation policy
                   </Link>.
@@ -59,7 +59,7 @@ export default function TermsPage() {
                   We respect your privacy and handle your data in accordance with our{" "}
                   <Link
                     href="/privacy-security"
-                    className="text-custom underline hover:text-custom/80"
+                    className="text-white underline hover:text-white/80"
                   >
                     privacy policy
                   </Link>.
@@ -72,22 +72,22 @@ export default function TermsPage() {
               <h2 className="font-semibold text-lg">Merchant and Partner Obligations</h2>
               <ul className="list-disc list-inside ml-4">
                 <li>Healthcare providers and diagnostic centers must comply with all applicable laws and regulations.</li>
-                <li>Providers must provide necessary documentation and adhere to our KYC (Know Your Customer) requirements.</li>
+                <li>Providers must provide necessary documentation and adhere to our KYC (Know Your primaryer) requirements.</li>
               </ul>
             </li>
             <li className="flex flex-col gap-3">
-              <h2 className="font-semibold text-lg">Customer Obligations</h2>
+              <h2 className="font-semibold text-lg">primaryer Obligations</h2>
               <ul className="list-disc list-inside ml-4">
-                <li>Customers must provide accurate information when booking appointments and tests.</li>
-                <li>Customers must comply with the refund and cancellation policies.</li>
-                <li>Customers have the right to request access, modification, or deletion of their personal data.</li>
+                <li>primaryers must provide accurate information when booking appointments and tests.</li>
+                <li>primaryers must comply with the refund and cancellation policies.</li>
+                <li>primaryers have the right to request access, modification, or deletion of their personal data.</li>
               </ul>
             </li>
             <li className="flex flex-col gap-3">
               <h2 className="font-semibold text-lg">Dispute Resolution</h2>
               <ul className="list-disc list-inside ml-4">
                 <li>Disputes will be resolved in accordance with applicable laws and regulations.</li>
-                <li>We encourage users to <Link href="/contact" className="text-custom underline hover:text-custom/80">contact us</Link> directly to resolve any issues or concerns.</li>
+                <li>We encourage users to <Link href="/contact" className="text-white underline hover:text-white/80">contact us</Link> directly to resolve any issues or concerns.</li>
               </ul>
             </li>
             <li className="flex flex-col gap-3">
@@ -105,12 +105,12 @@ export default function TermsPage() {
           <Separator />
 
           <section>
-            <h2 className="text-xl font-bold text-custom mb-2">Our Commitment to You</h2>
+            <h2 className="text-xl font-bold text-white mb-2">Our Commitment to You</h2>
             <p className="text-muted-foreground">
               At Hind Svaasth Seva, we prioritize the privacy and security of your data. By implementing these best practices, we aim to build trust and ensure that your personal information is protected. We are dedicated to providing a secure and user-friendly experience for all our patients.
             </p>
             <p className="text-muted-foreground mt-2">
-              If you have any questions or concerns about our Terms and Conditions, please do not hesitate to <Link href="/contact" className="text-custom underline hover:text-custom/80">contact us</Link>. Your trust is our top priority.
+              If you have any questions or concerns about our Terms and Conditions, please do not hesitate to <Link href="/contact" className="text-white underline hover:text-white/80">contact us</Link>. Your trust is our top priority.
             </p>
           </section>
         </CardContent>

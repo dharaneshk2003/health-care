@@ -120,12 +120,12 @@ function getTotalFee(value){
               {/* Doctor Info */}
               <div className="flex items-start gap-4 mb-6">
                 <div className="w-[80px] h-[80px] bg-yellow-100 rounded-lg flex items-center justify-center">
-                  {image_url ? <img src={image_url} className="w-[80px] h-[80px] object-fill border-4 border-custom rounded-lg"/> : <User className="w-8 h-8 text-yellow-600" />}
+                  {image_url ? <img src={image_url} className="w-[80px] h-[80px] object-fill border-4 border-primary rounded-lg"/> : <User className="w-8 h-8 text-yellow-600" />}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 text-lg">{doctor_name}</h3>
                   <p className="text-gray-600 text-sm">{department}</p>
-                  <div className="flex items-center gap-1 text-custom text-sm mt-1">
+                  <div className="flex items-center gap-1 text-white text-sm mt-1">
                     <MapPin className="w-3 h-3" />
                     <span>{address}</span>
                   </div>
@@ -138,7 +138,7 @@ function getTotalFee(value){
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-gray-500 text-sm uppercase tracking-wide">Select Date</span>
                     <Dialog>
-                      <DialogTrigger className="text-custom text-sm font-medium underline">Edit</DialogTrigger>
+                      <DialogTrigger className="text-primary text-sm font-medium underline">Edit</DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
                           <DialogTitle>
@@ -169,7 +169,7 @@ function getTotalFee(value){
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-gray-500 text-sm uppercase tracking-wide">TIME</span>
                     <Dialog>
-                      <DialogTrigger className="text-custom text-sm font-medium underline">Edit</DialogTrigger>
+                      <DialogTrigger className="text-primary text-sm font-medium underline">Edit</DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
                           <DialogTitle>
@@ -183,7 +183,7 @@ function getTotalFee(value){
                                   key={slot}
                                   type="button"
                                   variant={timeSlot === slot ? "default" : "outline"}
-                                  className={`text-xs ${timeSlot === slot ? "bg-custom hover:bg-custom" : ""}`}
+                                  className={`text-xs ${timeSlot === slot ? "bg-primary text-white hover:bg-primary" : ""}`}
                                   onClick={() => setTimeSlot(slot)}
                                 >
                                   {slot}
@@ -204,7 +204,7 @@ function getTotalFee(value){
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-gray-500 text-sm uppercase tracking-wide">APPOINTMENT TYPE</span>
                   <Dialog>
-                    <DialogTrigger className="text-custom text-sm font-medium underline">Edit</DialogTrigger>
+                    <DialogTrigger className="text-primary text-sm font-medium underline">Edit</DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle>
@@ -216,11 +216,10 @@ function getTotalFee(value){
                             {appointmentType.map((type) => (
                               <Button
                                 key={type.type}
-                                type="button"
                                 variant={selectedDraft === type.label ? "default" : "outline"}
                                 className={`my-1 h-15 w-full justify-start text-left ${selectedDraft === type.label
-                                  ? "bg-red-200 border-red-400 hover:bg-red-200 border hover:border-red-400"
-                                  : ""
+                                  ? "bg-primary hover:bg-red-200 border hover:border-red-500  text-white !important"
+                                  : "border hover:border-gray-400"
                                   }`}
                                 onClick={() =>
                                   setSelectedDraft(
@@ -229,8 +228,8 @@ function getTotalFee(value){
                                 }
                               >
                                 <div className="p-1">
-                                  <div className="text-black text-xl">{type.label}</div>
-                                  <div className="text-black text-md pb-1">{type.description}</div>
+                                  <div className= "text-xl">{type.label}</div>
+                                  <div className="text-md pb-1">{type.description}</div>
                                 </div>
                               </Button>
                             ))}
@@ -343,7 +342,7 @@ function getTotalFee(value){
                 <h2 className="font-semibold text-gray-900 text-xl">Payment Gateway</h2>
                 <Card className="text-right px-2 py-1 rounded-xl bg-white">
                   <span className="text-black text-md font-bold">Amount: </span>
-                  <span className="font-bold text-custom">₹{getTotalFee(consultation_fees)}</span>
+                  <span className="font-bold text-white">₹{getTotalFee(consultation_fees)}</span>
                 </Card>
               </div>
 
@@ -434,14 +433,14 @@ function getTotalFee(value){
                     placeholder="yourname@upi"
                     className="flex-1 bg-gray-50 border-gray-200"
                   />
-                  <Button className="bg-custom hover:bg-custom text-white px-6">
+                  <Button className="bg-primary hover:bg-primary text-white px-6">
                     Verify
                   </Button>
                 </div>
               </div>
 
               {/* Pay Button */}
-              <Button className="w-full bg-custom hover:bg-custom text-white py-3 text-lg font-semibold mb-4">
+              <Button className="w-full bg-primary hover:bg-primary text-white py-3 text-lg font-semibold mb-4">
                 Pay ₹{getTotalFee(consultation_fees)}
               </Button>
 
