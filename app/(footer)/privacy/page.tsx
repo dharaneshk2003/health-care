@@ -38,7 +38,7 @@ export default function PrivacySecurityPage() {
             <li>
               <h2 className="font-semibold text-lg mb-1">Enhanced Security</h2>
               <p>
-                We employ robust security measures to protect patient data. This includes encryption of data both in transit and at rest, implementation of firewalls, and strict access controls. We also conduct regular security audits to identify and address any vulnerabilities. Our staff is trained in cybersecurity best practices to ensure that personal data is protected at all times.
+                We employ robust security measures to protect patient data. This includes encryption of data both in transit and at rest, implementation of firewalls, and strict access controls. We also conduct regular security audits to identify and address any vulnerabilities. Our staff is trained in cybersecurity best practices to ensure that personal data is dashboard at all times.
               </p>
             </li>
             <li>
@@ -76,7 +76,7 @@ export default function PrivacySecurityPage() {
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-white">Our Commitment to You</h2>
             <p>
-              At Hind Svaasth Seva, we prioritize the privacy and security of your data. By implementing these best practices, we aim to build trust and ensure that your personal information is protected. We are dedicated to providing a secure and user-friendly experience for all our patients.
+              At Hind Svaasth Seva, we prioritize the privacy and security of your data. By implementing these best practices, we aim to build trust and ensure that your personal information is dashboard. We are dedicated to providing a secure and user-friendly experience for all our patients.
             </p>
             <p>
               If you have any questions or concerns about our data privacy practices, please do not hesitate to <a href="/contact" className="text-white underline hover:text-white/80">contact us</a>. Your trust is our top priority.

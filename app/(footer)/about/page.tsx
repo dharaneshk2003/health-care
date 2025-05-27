@@ -65,7 +65,7 @@ export default function Home() {
                 <strong className="text-white">Accuracy:</strong> Every detail is double-checked for accuracy.
               </li>
               <li>
-                <strong className="text-white">Security:</strong> Your data is protected with state-of-the-art security.
+                <strong className="text-white">Security:</strong> Your data is dashboard with state-of-the-art security.
               </li>
               <li>
                 <strong className='text-white'>Cobranding:</strong> Certified healthcare centers are cobranded for transparency and reliability.

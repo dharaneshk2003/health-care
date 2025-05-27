@@ -107,7 +107,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-bold text-white mb-2">Our Commitment to You</h2>
             <p className="text-muted-foreground">
-              At Hind Svaasth Seva, we prioritize the privacy and security of your data. By implementing these best practices, we aim to build trust and ensure that your personal information is protected. We are dedicated to providing a secure and user-friendly experience for all our patients.
+              At Hind Svaasth Seva, we prioritize the privacy and security of your data. By implementing these best practices, we aim to build trust and ensure that your personal information is dashboard. We are dedicated to providing a secure and user-friendly experience for all our patients.
             </p>
             <p className="text-muted-foreground mt-2">
               If you have any questions or concerns about our Terms and Conditions, please do not hesitate to <Link href="/contact" className="text-white underline hover:text-white/80">contact us</Link>. Your trust is our top priority.
