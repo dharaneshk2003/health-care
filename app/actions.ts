@@ -81,11 +81,11 @@ export const signInAction = async (formData: FormData) => {
 
 
   if (userRole === "doctor") {
-    return redirect("/protected/");
+    return redirect("/dashboard");
   } else if (userRole === "patient") {
     return redirect("/doctors");
   }
-  return redirect("/"); // Default redirect if no specific role match
+  return redirect("/doctors"); // Default redirect if no specific role match
 };
 
 
