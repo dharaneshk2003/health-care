@@ -4,6 +4,18 @@ import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/server";
+import { Heart, Bell, Settings, LogOut } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu.tsx";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
+
 
 export default async function AuthButton() {
   const supabase = await createClient();
@@ -11,6 +23,9 @@ export default async function AuthButton() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  let role = user?.user_metadata?.role;
+  console.log(role);
 
   if (!hasEnvVars) {
     return (
@@ -49,15 +64,77 @@ export default async function AuthButton() {
     );
   }
   return user ? (
-    <div className="flex items-center gap-4">
-      `Hey, ${user.email.split("@")[0]}!`
-!
-      <form action={signOutAction}>
-        <Button type="submit" variant={"outline"}>
-          Sign out
-        </Button>
-      </form>
-    </div>
+    role == "doctor" ? (
+     <div className="flex items-center space-x-4">
+          <Button variant="ghost" size="icon">
+            <Bell className="h-5 w-5" />
+            <span className="sr-only">Notifications</span>
+          </Button>
+
+          <Button variant="ghost" size="icon">
+            <Settings className="h-5 w-5" />
+            <span className="sr-only">Settings</span>
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="https://www.flaticon.com/free-icon/account_3033143?k=1748349563281&log-in=google" alt="User" className=""/>
+                  <AvatarFallback>D</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-auto" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user.email.split("@")[0]}</p>
+                  <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={signOutAction}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+    ):(
+      <div className="flex items-center space-x-4 mt-2">
+          <Button variant="ghost" size="icon">
+            <Bell className="h-5 w-5" />
+            <span className="sr-only">Notifications</span>
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Avatar className="h-8 w-8 mb-[4px]">
+                  <AvatarImage src="../Images/account.png" alt="User" />
+                  <AvatarFallback>P</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-auto" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user.email.split("@")[0]}</p>
+                  <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Profile</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button variant="ghost" onClick={signOutAction} className="flex mb-1">
+            <LogOut className="h-5 w-5" />
+            <span className="">Log out</span>
+          </Button>
+        </div>
+    )
   ) : (
     <div className="flex gap-2">
       <Button asChild size="sm" variant={"outline"}>
