@@ -53,8 +53,8 @@ export const updateSession = async (request: NextRequest) => {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  if(request.nextUrl.pathname === "/" && role === "doctor") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  if(request.nextUrl.pathname === "/" && (role === "patient" || !user)){
+    return NextResponse.redirect(new URL("/doctors", request.url));
   }
 
 
