@@ -34,12 +34,9 @@ export function SupervisorStaffManagement() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   const staffCategories = [
-    { id: "doctors", name: "Doctors", count: 12 },
-    { id: "nurses", name: "Nurses", count: 24 },
-    { id: "receptionists", name: "Receptionists", count: 8 },
-    { id: "security", name: "Security", count: 6 },
-    { id: "admin", name: "Administrative", count: 10 },
-    { id: "lab", name: "Laboratory", count: 5 },
+    { id: "doctors", name: "Doctors", count: 3 },
+    { id: "admin", name: "Administrative", count: 0 },
+    { id: "lab", name: "Laboratory", count: 0 },
   ]
 
   const staffMembers = {
@@ -388,9 +385,6 @@ export function SupervisorStaffManagement() {
               >
                 <CardContent className="p-4 flex flex-col items-center justify-center text-center">
                   {category.id === "doctors" && <Stethoscope className="h-8 w-8 mb-2 text-primary" />}
-                  {category.id === "nurses" && <UserPlus className="h-8 w-8 mb-2 text-primary" />}
-                  {category.id === "receptionists" && <User className="h-8 w-8 mb-2 text-primary" />}
-                  {category.id === "security" && <UserCheck className="h-8 w-8 mb-2 text-primary" />}
                   {category.id === "admin" && <Briefcase className="h-8 w-8 mb-2 text-primary" />}
                   {category.id === "lab" && <Flask className="h-8 w-8 mb-2 text-primary" />}
                   <h3 className="font-medium">{category.name}</h3>

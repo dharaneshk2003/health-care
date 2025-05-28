@@ -288,7 +288,7 @@ const timeFormatForFrontEnd = (time) => {
                     Cancel
                   </Button>
                   <Button
-                    className="bg-primary hover:bg-secondary"
+                    className="bg-primary hover:bg-primary/60"
                     type="submit"
                   >
                     Add Patient
