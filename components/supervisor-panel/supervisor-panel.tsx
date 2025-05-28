@@ -18,8 +18,7 @@ export function SupervisorPanel() {
   }
 
   return (
-    <div className="m-0 bg-muted/30 flex flex-col">
-      {/* <SupervisorHeader/> */}
+    <div className="m-0 bg-muted/30 flex flex-col w-[1200px]">
       <div className="flex flex-1">
         <SupervisorSidebar currentView={currentView} onNavigate={navigateTo} />
 

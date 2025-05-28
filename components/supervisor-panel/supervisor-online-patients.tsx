@@ -13,9 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export function SupervisorOnlinePatients() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isAddPatientOpen, setIsAddPatientOpen] = useState(false)
-
+  const randomSixDigit = Math.floor(Math.random() * (999999 - 111111 + 1)) + 111111;
   const onlinePatients = [
     {
       id: "HSS-123456",
@@ -27,7 +25,7 @@ export function SupervisorOnlinePatients() {
       specialty: "Cardiology",
       hospital: "Arogya Multi-Specialty Hospital",
       date: "May 15, 2023",
-      time: "10:30 AM",
+      time: "10:30",
       status: "confirmed",
       amount: 1200,
     },
@@ -41,7 +39,7 @@ export function SupervisorOnlinePatients() {
       specialty: "Dermatology",
       hospital: "Skin & Care Clinic",
       date: "June 22, 2023",
-      time: "2:15 PM",
+      time: "14:15",
       status: "pending",
       amount: 1000,
     },
@@ -55,7 +53,7 @@ export function SupervisorOnlinePatients() {
       specialty: "Orthopedic",
       hospital: "Joint Care Center",
       date: "July 8, 2023",
-      time: "11:00 AM",
+      time: "11:00",
       status: "confirmed",
       amount: 1500,
     },
@@ -69,13 +67,58 @@ export function SupervisorOnlinePatients() {
       specialty: "Pediatrics",
       hospital: "Children's Wellness Center",
       date: "July 12, 2023",
-      time: "9:45 AM",
+      time: "9:45",
       status: "pending",
       amount: 900,
     },
   ]
+  const [searchQuery, setSearchQuery] = useState("")
+  const [patientsData,setPatientsData] = useState(onlinePatients);
+  const [isAddPatientOpen, setIsAddPatientOpen] = useState(false)
+  const [formData, setFormData] = useState({
+    id:`HSS-${randomSixDigit}`,
+    name: "",
+    phone: "",
+    age: 0,
+    gender: "",
+    status: "",
+    doctor: "",
+    specialty: "",
+    date: "",
+    time: "",
+    notes: "",
+    amount : Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000
+  });
 
-  const filteredPatients = onlinePatients.filter(
+
+
+ const handleChange = (field, value) => {
+  setFormData((prev) => ({
+    ...prev,
+    [field]: field === "age" ? Number(value) : value,
+  }));
+};
+
+const timeFormatForFrontEnd = (time) => {
+  const [hour, minute] = time.split(":").map(Number);
+  const period = hour >= 12 ? "PM" : "AM";
+  const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
+  return `${formattedHour}:${minute.toString().padStart(2, "0")} ${period}`;
+};
+
+
+
+  const handleSubmit = (e) => {
+  e.preventDefault();
+  setPatientsData((prev) => [...prev, formData]);
+  console.log(formData);
+  setIsAddPatientOpen(false);
+};
+
+
+  
+
+  const filteredPatients = patientsData.filter(
     (patient) =>
       patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       patient.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -100,7 +143,7 @@ export function SupervisorOnlinePatients() {
 
           <Dialog open={isAddPatientOpen} onOpenChange={setIsAddPatientOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-secondary">
+              <Button className="bg-primary hover:bg-primary/60">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Patient
               </Button>
@@ -109,106 +152,149 @@ export function SupervisorOnlinePatients() {
               <DialogHeader>
                 <DialogTitle>Add New Patient</DialogTitle>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="name">Patient Name</Label>
-                    <Input id="name" placeholder="Enter patient name" />
+              <form onSubmit={handleSubmit}>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="name">Patient Name</Label>
+                      <Input
+                        id="name"
+                        placeholder="Enter patient name"
+                        value={formData.name}
+                        onChange={(e) => handleChange("name", e.target.value)}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="phone">Phone Number</Label>
+                      <Input
+                        id="phone"
+                        placeholder="Enter phone number"
+                        value={formData.phone}
+                        onChange={(e) => handleChange("phone", e.target.value)}
+                      />
+                    </div>
                   </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="age">Age</Label>
+                      <Input
+                        id="age"
+                        type="number"
+                        placeholder="Age"
+                        value={formData.age}
+                        onChange={(e) => handleChange("age", e.target.value)}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="gender">Gender</Label>
+                      <Select onValueChange={(value) => handleChange("gender", value)}>
+                        <SelectTrigger id="gender">
+                          <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Male">Male</SelectItem>
+                          <SelectItem value="Female">Female</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="status">Status</Label>
+                      <Select onValueChange={(value) => handleChange("status", value)}>
+                        <SelectTrigger id="status">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="confirmed">Confirmed</SelectItem>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="doctor">Doctor</Label>
+                      <Select onValueChange={(value) => handleChange("doctor", value)}>
+                        <SelectTrigger id="doctor">
+                          <SelectValue placeholder="Select doctor" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="dr-rajesh">Dr. Rajesh Kumar</SelectItem>
+                          <SelectItem value="dr-priya">Dr. Priya Sharma</SelectItem>
+                          <SelectItem value="dr-vikram">Dr. Vikram Singh</SelectItem>
+                          <SelectItem value="dr-ananya">Dr. Ananya Patel</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="specialty">Specialty</Label>
+                      <Select
+                        onValueChange={(value) => handleChange("specialty", value)}
+                      >
+                        <SelectTrigger id="specialty">
+                          <SelectValue placeholder="Select specialty" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Cardiology">Cardiology</SelectItem>
+                          <SelectItem value="Dermatology">Dermatology</SelectItem>
+                          <SelectItem value="Orthopedic">Orthopedic</SelectItem>
+                          <SelectItem value="Pediatrics">Pediatrics</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="date">Appointment Date</Label>
+                      <Input
+                        id="date"
+                        type="date"
+                        value={formData.date}
+                        onChange={(e) => handleChange("date", e.target.value)}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="time">Appointment Time</Label>
+                      <Input
+                        id="time"
+                        type="time"
+                        value={formData.time}
+                        onChange={(e) => handleChange("time", e.target.value)}
+                      />
+                    </div>
+                  </div>
+
                   <div className="grid gap-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" placeholder="Enter phone number" />
+                    <Label htmlFor="notes">Notes</Label>
+                    <Textarea
+                      id="notes"
+                      placeholder="Additional notes"
+                      value={formData.notes}
+                      onChange={(e) => handleChange("notes", e.target.value)}
+                    />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="age">Age</Label>
-                    <Input id="age" type="number" placeholder="Age" />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="gender">Gender</Label>
-                    <Select>
-                      <SelectTrigger id="gender">
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="status">Status</Label>
-                    <Select>
-                      <SelectTrigger id="status">
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="confirmed">Confirmed</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    type="button"
+                    onClick={() => setIsAddPatientOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="bg-primary hover:bg-secondary"
+                    type="submit"
+                  >
+                    Add Patient
+                  </Button>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="doctor">Doctor</Label>
-                    <Select>
-                      <SelectTrigger id="doctor">
-                        <SelectValue placeholder="Select doctor" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="dr-rajesh">Dr. Rajesh Kumar</SelectItem>
-                        <SelectItem value="dr-priya">Dr. Priya Sharma</SelectItem>
-                        <SelectItem value="dr-vikram">Dr. Vikram Singh</SelectItem>
-                        <SelectItem value="dr-ananya">Dr. Ananya Patel</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="specialty">Specialty</Label>
-                    <Select>
-                      <SelectTrigger id="specialty">
-                        <SelectValue placeholder="Select specialty" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cardiology">Cardiology</SelectItem>
-                        <SelectItem value="dermatology">Dermatology</SelectItem>
-                        <SelectItem value="orthopedic">Orthopedic</SelectItem>
-                        <SelectItem value="pediatrics">Pediatrics</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="date">Appointment Date</Label>
-                    <Input id="date" type="date" />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="time">Appointment Time</Label>
-                    <Input id="time" type="time" />
-                  </div>
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="notes">Notes</Label>
-                  <Textarea id="notes" placeholder="Additional notes" />
-                </div>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsAddPatientOpen(false)}>
-                  Cancel
-                </Button>
-                <Button className="bg-primary hover:bg-secondary" onClick={() => setIsAddPatientOpen(false)}>
-                  Add Patient
-                </Button>
-              </div>
+              </form>
             </DialogContent>
           </Dialog>
         </div>
@@ -218,13 +304,12 @@ export function SupervisorOnlinePatients() {
         {filteredPatients.map((patient) => (
           <Card key={patient.id} className="overflow-hidden">
             <div
-              className={`h-2 ${
-                patient.status === "confirmed"
-                  ? "bg-green-500"
-                  : patient.status === "pending"
-                    ? "bg-amber-500"
-                    : "bg-red-500"
-              }`}
+              className={`h-2 ${patient.status === "confirmed"
+                ? "bg-green-500"
+                : patient.status === "pending"
+                  ? "bg-amber-500"
+                  : "bg-red-500"
+                }`}
             ></div>
             <CardHeader className="pb-2">
               <div className="flex justify-between items-start">
@@ -268,7 +353,7 @@ export function SupervisorOnlinePatients() {
                 </div>
                 <div className="flex items-center">
                   <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>{patient.time}</span>
+                  <span>{timeFormatForFrontEnd(patient.time)}</span>
                 </div>
                 <div className="flex items-center">
                   <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
