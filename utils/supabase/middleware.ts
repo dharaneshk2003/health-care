@@ -57,6 +57,27 @@ export const updateSession = async (request: NextRequest) => {
     return NextResponse.redirect(new URL("/doctors", request.url));
   }
 
+  if((request.nextUrl.pathname === "/sign-in/doctor" || request.nextUrl.pathname==="/sign-up/doctor") && (role==="patient")){
+    return NextResponse.redirect(new URL("/sign-in/patient", request.url));
+  }
+
+  if((request.nextUrl.pathname === "/sign-in") && (role==="patient" || !user)){
+    return NextResponse.redirect(new URL("/sign-in/patient", request.url));
+  }
+
+  if((request.nextUrl.pathname === "/sign-up") && (role==="patient" || !user)){
+    return NextResponse.redirect(new URL("/sign-up/patient", request.url));
+  }
+
+  if((request.nextUrl.pathname === "/sign-in") && (role==="doctor")){
+    return NextResponse.redirect(new URL("/sign-in/doctor", request.url));
+  }
+
+  if((request.nextUrl.pathname === "/sign-up") && (role==="doctor" || !user)){
+    return NextResponse.redirect(new URL("/sign-up/doctor", request.url));
+  }
+
+
 
     return response;
   } catch (e) {

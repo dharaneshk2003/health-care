@@ -1,6 +1,6 @@
 // app/login/page.tsx
 import type { Message } from "@/components/form-message";
-import LoginForm from "./LoginForm";
+import PatientLoginForm from "./PatientLoginForm.tsx";
 
 export default async function LoginPage({
   searchParams,
@@ -10,8 +10,8 @@ export default async function LoginPage({
   const message = await searchParams;
 
   return (
-    <div className="w-[500px] bg-muted/30 flex flex-col">
-      <LoginForm message={message} />
+    <div className="w-[500px] bg-muted/30 flex flex-col mt-12">
+      <PatientLoginForm message={message} />
     </div>
   );
 }

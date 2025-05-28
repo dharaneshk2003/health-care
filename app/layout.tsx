@@ -66,7 +66,7 @@ export default function RootLayout({
               <div className="flex flex-col gap-5 p-0 m-0">
                 {children}
               </div>
-              <footer className="w-full border-t bg-background pt-5 pb-4">
+              <footer className="w-full border-t bg-background pt-5 pb-4 mt-auto">
                 <nav
                   className="flex flex-wrap justify-center items-center gap-8 text-sm text-muted-foreground"
                   aria-label="Footer"
