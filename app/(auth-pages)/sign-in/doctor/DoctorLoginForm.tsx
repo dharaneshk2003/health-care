@@ -30,13 +30,13 @@ export default function DoctorLoginForm({ message }: { message: Message }) {
                 </CardDescription>
             </CardHeader>
             <CardContent className="m-0">
-                <form className="space-y-2 mt-0" action={signInAction}>
+                <form className="mt-2" action={signInAction}>
                     <input type="hidden" name="role" value="doctor" />
-                    <div className="space-y-2">
+                    <div className="">
                         <Label htmlFor="email">Email</Label>
-                        <Input id="email" name="email" placeholder="doctor@example.com" required />
+                        <Input id="email" name="email" placeholder="doctor@example.com" required className="mt-1"/>
                     </div>
-                    <div className="space-y-2 relative">
+                    <div className="my-2 relative">
                         <Label htmlFor="password">Password</Label>
                         <Input
                             id="password"
@@ -44,18 +44,19 @@ export default function DoctorLoginForm({ message }: { message: Message }) {
                             type={showPassword ? "text" : "password"}
                             placeholder="Enter your password"
                             required
+                            className="mt-1"
                         />
                         <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => setShowPassword((prev) => !prev)}
-                            className="absolute right-2 top-8 p-1 h-auto"
+                             className="absolute right-[18px] top-[39px] h-auto"
                         >
                             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </Button>
                     </div>
-                    <Button type="submit" className="w-full text-white">
+                    <Button type="submit" className="w-full text-white mt-4">
                         Sign in
                     </Button>
                     <FormMessage message={message} />

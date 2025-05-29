@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signUpAction } from "@/app/actions";
+import { signUpActionPatient } from "@/app/actions";
 import { FormMessage, type Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,13 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function PatientRegisterForm({ message }: { message: Message }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -33,40 +40,68 @@ export default function PatientRegisterForm({ message }: { message: Message }) {
       </CardHeader>
 
       <CardContent>
-        <form className="space-y-2 relative" action={signUpAction}>
-          <input type="hidden" name="role" value="patient" />
-
-          <div className="space-y-2">
+        <form className="" action={signUpActionPatient}>
+          <div className="">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" required />
+            <Input id="email" name="email" placeholder="patient@example.com" required className="mt-1" />
           </div>
 
-          <div className="space-y-2 relative">
+          <div className="my-2">
+            <Label htmlFor="name">Full Name</Label>
+            <Input id="name" name="name" placeholder="Enter Here.." required className="mt-1" />
+          </div>
+
+          <div className="flex gap-4 my-2">
+            <div className="w-1/2">
+              <Label htmlFor="gender" className="">Gender</Label>
+              <Select name="gender" required>
+                <SelectTrigger id="gender" className="mt-1">
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="w-1/2">
+              <Label htmlFor="age">Age</Label>
+              <Input id="age" name="age" type="number" placeholder="Enter your age" required className="mt-1" />
+            </div>
+          </div>
+
+          <div className="my-2">
+            <Label htmlFor="mobile">Mobile Number</Label>
+            <Input id="mobile" name="mobile" type="tel" placeholder="Enter your mobile number" required className="mt-1" />
+          </div>
+        
+         <div className="my-2">
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"
               name="password"
-              className=""
               type={showPassword ? "text" : "password"}
-              minLength={6}
+              placeholder="Enter your password"
               required
+              className="mt-1"
             />
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-2 top-8 p-1 h-auto mt-5"
+              className="absolute right-[590px] top-[545px] h-auto"
             >
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </Button>
           </div>
 
-          <SubmitButton pendingText="Signing up..." className="w-full">
+          <input type="hidden" name="role" value="patient" className="" />
+          <SubmitButton pendingText="Signing up..." type="submit" className="w-full text-white mt-2">
             Sign up
           </SubmitButton>
-
-          <FormMessage message={message} />
         </form>
       </CardContent>
 

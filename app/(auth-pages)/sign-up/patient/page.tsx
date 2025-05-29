@@ -15,9 +15,7 @@ export default async function SignupPage({
   return (
     <div className="w-[500px] bg-muted/30 flex flex-col">
       <PatientRegisterForm message={message} />
-      <div>
         <SmtpMessage />
-      </div>
     </div>
   );
 }

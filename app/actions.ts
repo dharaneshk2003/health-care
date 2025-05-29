@@ -5,18 +5,23 @@ import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export const signUpAction = async (formData: FormData) => {
+export const signUpActionPatient = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const role = formData.get("role")?.toString();
+  const gender = formData.get("gender")?.toString();
+  const age = formData.get("age");
+  const mobile = formData.get("mobile")?.toString();
+  const name = formData.get("name")?.toString();
+
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
 
-  if (!email || !password || !role) {
+  if (!email || !password || !role || !gender || !age || !mobile) {
     return encodedRedirect(
       "error",
       "/sign-up",
-      "Email, password, and role are required"
+      "All fields are required"
     );
   }
 
@@ -24,7 +29,13 @@ export const signUpAction = async (formData: FormData) => {
     email,
     password,
     options: {
-      data: { role }, // Store role in user's metadata
+      data: {
+        role,
+        gender,
+        age,
+        mobile,
+        name
+      },
       emailRedirectTo: `${origin}/auth/callback`,
     },
   });
@@ -37,9 +48,58 @@ export const signUpAction = async (formData: FormData) => {
   return encodedRedirect(
     "success",
     "/sign-up",
-    "Thanks for signing up! Please check your email for a verification link. after verified your email, you can close this tab and sign in with your account."
+    "Thanks for signing up! Please check your email for a verification link. After verifying your email, you can close this tab and sign in with your account."
   );
 };
+
+export const signUpActionDoctor = async (formData: FormData) => {
+  const email = formData.get("email")?.toString();
+  const password = formData.get("password")?.toString();
+  const role = formData.get("role")?.toString();
+  const name = formData.get("name")?.toString();
+  const department = formData.get("department")?.toString();
+  const experience = formData.get("experience")?.toString(); // Renamed as experience in UI
+  const education = formData.get("education")?.toString();
+
+  const supabase = await createClient();
+  const origin = (await headers()).get("origin");
+
+  if (!email || !password || !role || !name || !department || !experience || !education) {
+    return encodedRedirect(
+      "error",
+      "/sign-up",
+      "All fields are required"
+    );
+  }
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        role,
+        name,
+        department,
+        experience,
+        education,
+      },
+      emailRedirectTo: `${origin}/auth/callback`,
+    },
+  });
+
+  if (error) {
+    console.error("[Sign Up Error]", error.code, error.message);
+    return encodedRedirect("error", "/sign-up", error.message);
+  }
+
+  return encodedRedirect(
+    "success",
+    "/sign-up",
+    "Thanks for signing up! Please check your email for a verification link. After verifying your email, you can close this tab and sign in with your account."
+  );
+};
+
+
 
 export const signInAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();

@@ -63,7 +63,7 @@ export default function DoctorCard({ doctors }) {
                         </div>
                         <p className="my-2"></p>
                         <hr className="mb-2" />
-                        <p className="mx-0 font-bold text-lg mt-1">Consultation Fee : {doctor.consultation_fees}</p>
+                        <p className="mx-0 font-bold text-lg mt-1">Consultation Fee : ₹{doctor.consultation_fees}</p>
                     </CardContent>
                     <CardFooter className="pt-2">
                         <Button className="bg-primary text-white mt-0 hover:bg-red-500 hover:text-white" onClick={()=> router.push(`/doctors/${doctor.id}`)}>Book Appointment</Button>

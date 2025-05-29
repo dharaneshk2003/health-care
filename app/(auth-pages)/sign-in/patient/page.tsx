@@ -10,7 +10,7 @@ export default async function LoginPage({
   const message = await searchParams;
 
   return (
-    <div className="w-[500px] bg-muted/30 flex flex-col mt-12">
+    <div className="w-[500px] bg-muted/30 flex flex-col m-0">
       <PatientLoginForm message={message} />
     </div>
   );

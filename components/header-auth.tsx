@@ -80,7 +80,7 @@ export default async function AuthButton() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://www.flaticon.com/free-icon/account_3033143?k=1748349563281&log-in=google" alt="User" className=""/>
+                  <AvatarImage src="../Images/account.png" alt="User" />
                   <AvatarFallback>D</AvatarFallback>
                 </Avatar>
               </Button>
@@ -112,7 +112,7 @@ export default async function AuthButton() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                <Avatar className="h-8 w-8 mb-[4px]">
+                <Avatar className="h-8 w-8">
                   <AvatarImage src="../Images/account.png" alt="User" />
                   <AvatarFallback>P</AvatarFallback>
                 </Avatar>
