@@ -1,6 +1,6 @@
 "use client"
-
 import { useState } from "react"
+import { formatISO } from 'date-fns'; 
 import { ArrowLeft, Calendar, Clock, User, Info, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,24 +13,44 @@ import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from "next/navigation"
-import Image from "next/image"
 import doctorIMg from "@/components/Images/doctor.png"
+import { getPatientId } from "../app/backend.ts"
+import { createAppointment } from "../app/actions.ts"
 
-export default function UserBookingForm({ doctor }) {
+// adjust path as needed
+
+export default function UserBookingForm({ doctor, patient }) {
+  let patient_id = patient?.id;
+  let { age, email, gender, mobile, name } = patient?.user_metadata;
   const router = useRouter()
-  const [date, setDate] = useState<Date>()
-  const [timeSlot, setTimeSlot] = useState<string>("")
-  const [referralId, setReferralId] = useState<string>("")
-  const [notes, setNotes] = useState<string>("")
-  const [appointmentType, setAppointmentType] = useState<string>("new")
-  const [showMap, setShowMap] = useState(true)
+
+  const [formData, setFormData] = useState({
+    date: null as Date | null,
+    timeSlot: "",
+    referralId: "",
+    notes: "",
+    appointmentType: "new",
+  });
+  const [showMap, setShowMap] = useState(true);
+  const { date, timeSlot, referralId, notes, appointmentType } = formData;
+
+
+  const handleChange = (field: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const setDate = (value: Date | null) => handleChange("date", value);
+  const setTimeSlot = (value: string) => handleChange("timeSlot", value);
+  const setReferralId = (value: string) => handleChange("referralId", value);
+  const setAppointmentType = (value: string) => handleChange("appointmentType", value);
+  const setNotes = (value: string) => handleChange("notes", value);
+
 
 
   if (!doctor) {
     return <div>Doctor not found</div>
   }
   const { id, doctor_name, department, ratings, experience, consultation_fees, address, location, available_from_time, available_to_time, available_days, image_url } = doctor;
-
   const dummyDoctor = {
     id,
     name: doctor_name,
@@ -78,59 +98,104 @@ export default function UserBookingForm({ doctor }) {
 
   const isValidReferral = () => {
     if (!referralId) return true
-    const regex = /^\d{5}re$/
+    const regex = /^\d{5}re$/;
     return regex.test(referralId)
   }
 
-  const availableDays = available_days;
+  const availableDays = available_days;// adjust import if needed
 
-  const handleSubmit = async () => {
-  if (!date || !timeSlot || !isValidReferral()) {
-    alert("Please fill all required fields correctly.");
-    return;
+  function getEighteenPercent(value: number) {
+    return value * 0.18;
   }
 
-  const dataToSend = {
-    date: format(date, "yyyy-MM-dd"),
-    timeSlot,
-    referralId,
-    notes,
-    appointmentType,
-    doctorId: id,
-  };
+  function getTotalFee(value: number) {
+    let gst = getEighteenPercent(value);
+    return value + gst + 100;
+  }
 
-  router.push(`/doctors/${id}/payment`);
+
+
+
+const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.date || !formData.timeSlot) {
+      alert("Please select a valid date and time.");
+      return;
+    }
+
+    const appointmentDate = format(formData.date, "yyyy-MM-dd"); // ISO-friendly format
+
+    const payload = {
+      appointment_date: formatISO(new Date(formData.date)),
+      appointment_time: formData.timeSlot,
+      referral_id: formData.referralId || null,
+      appointment_type: formData.appointmentType,
+      notes: formData.notes || "",
+      patient_id: patient_id,
+      doctor_id: id,
+      consultation_fees: calculateTotal(),
+      total_fees: getTotalFee(calculateTotal()),
+    };
+
+    console.log("payload : ", payload)
+    const form = new FormData();
+    Object.entries(payload).forEach(([key, value]) => {
+      form.append(key, value);
+    });
+
+    try {
+      const result = await createAppointment(null, form);
+      if (result.error) {
+        alert(result.error);
+        return;
+      }
+      router.push(`/doctors/${id}/payment`);
+    } catch (error) {
+      alert('Failed to create appointment. Please try again.');
+    }
 };
+
+
+
+
 
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 mt-4">
           <h1 className="text-2xl font-bold mb-6">Book Your Appointment</h1>
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <input type="hidden" name="patient_id" value={patient_id} />
+            <input type="hidden" name="doctor_id" value={id} />
+            <input type="hidden" name="consultation_fees" value={calculateTotal()} />
+            <input type="hidden" name="total_fees" value={getTotalFee(calculateTotal())}/>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="date">Select Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button id="date" variant="outline" className="w-full justify-start text-left font-normal">
+                    <Button
+                      id="date"
+                      name="date"
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                    >
                       <Calendar className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : <span>Select date</span>}
+                      {formData.date ? format(formData.date, "PPP") : <span>Select date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
                     <CalendarComponent
                       mode="single"
-                      selected={date}
+                      selected={formData.date}
                       onSelect={setDate}
                       initialFocus
                       disabled={(date) => {
                         const today = new Date();
-                        const isPast = date < today.setHours(0, 0, 0, 0); // disables past dates
-
+                        const isPast = date < today.setHours(0, 0, 0, 0);
                         const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-                        const isUnavailableDay = !availableDays.includes(dayName); // disables unavailable weekdays
-
+                        const isUnavailableDay = !availableDays.includes(dayName);
                         return isPast || isUnavailableDay;
                       }}
                     />
@@ -139,14 +204,15 @@ export default function UserBookingForm({ doctor }) {
               </div>
 
               <div className="space-y-2">
-                <Label>Select Time Slot</Label>
-                <div className="grid grid-cols-3 gap-2">
+                <Label htmlFor="timeSlot">Select Time Slot</Label>
+                <div className="grid grid-cols-3 gap-2" id="timeSlot">
                   {timeSlots.map((slot) => (
                     <Button
                       key={slot}
                       type="button"
-                      variant={timeSlot === slot ? "default" : "outline"}
-                      className={`text-xs ${timeSlot === slot ? "bg-primary text-white hover:bg-primary hover:text-white" : ""}`}
+                      name="timeSlot"
+                      variant={formData.timeSlot === slot ? "default" : "outline"}
+                      className={`text-xs ${formData.timeSlot === slot ? "bg-primary text-white hover:bg-primary hover:text-white" : ""}`}
                       onClick={() => setTimeSlot(slot)}
                     >
                       {slot}
@@ -158,7 +224,7 @@ export default function UserBookingForm({ doctor }) {
 
             <div className="space-y-2">
               <div className="flex items-center">
-                <Label htmlFor="referral" className="mr-2">Referral ID (Optional)</Label>
+                <Label htmlFor="referralId" className="mr-2">Referral ID (Optional)</Label>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -171,9 +237,10 @@ export default function UserBookingForm({ doctor }) {
                 </TooltipProvider>
               </div>
               <Input
-                id="referral"
+                id="referralId"
+                name="referralId"
                 placeholder="Enter referral ID (e.g., 12345re)"
-                value={referralId}
+                value={formData.referralId}
                 onChange={(e) => setReferralId(e.target.value)}
                 className={!isValidReferral() ? "border-primary" : ""}
               />
@@ -183,15 +250,21 @@ export default function UserBookingForm({ doctor }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="type">Appointment Type</Label>
-              <RadioGroup value={appointmentType} onValueChange={setAppointmentType} className="flex flex-col space-y-1">
+              <Label htmlFor="appointmentType">Appointment Type</Label>
+              <RadioGroup
+                id="appointmentType"
+                name="appointmentType"
+                value={formData.appointmentType}
+                onValueChange={setAppointmentType}
+                className="flex flex-col space-y-1"
+              >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="new" id="new" className=""/>
+                  <RadioGroupItem value="new" id="new" />
                   <Label htmlFor="new">New Consultation</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="followup" id="followup" />
-                  <Label htmlFor="followup">Follow-up</Label>
+                  <RadioGroupItem value="follow-up" id="follow-up" />
+                  <Label htmlFor="follow-up">Follow-up</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="emergency" id="emergency" />
@@ -204,21 +277,28 @@ export default function UserBookingForm({ doctor }) {
               <Label htmlFor="notes">Additional Notes (Optional)</Label>
               <Textarea
                 id="notes"
+                name="notes"
                 placeholder="Any specific concerns or information for the doctor"
-                value={notes}
+                value={formData.notes}
                 onChange={(e) => setNotes(e.target.value)}
               />
             </div>
+
             <Button
               type="button"
               className="w-full bg-primary text-white hover:bg-red-500"
-              disabled={!date || !timeSlot || !isValidReferral()}
+              disabled={
+                !formData.date ||
+                !formData.timeSlot ||
+                !patient || // Assuming `patient` is a separate state/prop
+                !isValidReferral()
+              }
               onClick={handleSubmit}
             >
               Proceed to Payment
             </Button>
-
           </form>
+
         </div>
 
         <div className="space-y-6">
@@ -255,7 +335,6 @@ export default function UserBookingForm({ doctor }) {
                     src={dummyDoctor.image_url}
                     alt={dummyDoctor.name || "Doctor"}
                     className="rounded-md object-contain w-[130px] h-[123px] border-2 border-primary"
-                    priority
                   />
                 </div>
               </div>

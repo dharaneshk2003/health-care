@@ -1,5 +1,5 @@
 "use client";
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Card,
@@ -34,11 +34,18 @@ import phonepeIMg from "@/components/Images/phonepe.png";
 import Image from "next/image";
 
 
-export default function PaymentInterface({ doctor }) {
+export default function PaymentInterface({ doctor, patient }) {
+  let details = patient?.user_metadata;
   const [date, setDate] = React.useState<Date | undefined>(new Date())
   const [timeSlot, setTimeSlot] = useState<string>("")
   const [selected, setSelected] = useState("Consultation");
   const [selectedDraft, setSelectedDraft] = useState("")
+  const [formData, setFormData] = useState({
+    fullName: details?.name || "",
+    email: details?.email || "",
+    phone: details?.mobile || "",
+    reason: ""
+  });
   const { id, doctor_name, department, ratings, experience, consultation_fees, address, location, available_from_time, available_to_time, available_days, image_url } = doctor;
   function generateTimeSlots(fromTime, toTime) {
     const slots = [];
@@ -95,15 +102,26 @@ export default function PaymentInterface({ doctor }) {
   ];
 
   function getEighteenPercent(value) {
-  return value * 0.18;
-}
+    return value * 0.18;
+  }
 
 
-function getTotalFee(value){
-  let gst = getEighteenPercent(value);
-  return value + gst + 100;
-}
+  function getTotalFee(value) {
+    let gst = getEighteenPercent(value);
+    return value + gst + 100;
+  }
 
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  const handleClick = () => {
+    console.log("Form data:", formData);
+  };
 
   return (
     <div className="w-[1520px] p-4">
@@ -120,14 +138,14 @@ function getTotalFee(value){
               {/* Doctor Info */}
               <div className="flex items-start gap-4 mb-6">
                 <div className="w-[80px] h-[80px] bg-yellow-100 rounded-lg flex items-center justify-center">
-                  {image_url ? <img src={image_url} className="w-[80px] h-[80px] object-fill border-4 border-primary rounded-lg"/> : <User className="w-8 h-8 text-yellow-600" />}
+                  {image_url ? <img src={image_url} className="w-[80px] h-[80px] object-fill border-4 border-primary rounded-lg" /> : <User className="w-8 h-8 text-yellow-600" />}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 text-lg">{doctor_name}</h3>
                   <p className="text-gray-600 text-sm">{department}</p>
                   <div className="flex items-center gap-1 text-white text-sm mt-1">
-                    <MapPin className="w-3 h-3" />
-                    <span>{address}</span>
+                    <MapPin className="w-3 h-3 text-primary" />
+                    <span className="text-primary">{address}</span>
                   </div>
                 </div>
               </div>
@@ -228,7 +246,7 @@ function getTotalFee(value){
                                 }
                               >
                                 <div className="p-1">
-                                  <div className= "text-xl">{type.label}</div>
+                                  <div className="text-xl">{type.label}</div>
                                   <div className="text-md pb-1">{type.description}</div>
                                 </div>
                               </Button>
@@ -290,15 +308,15 @@ function getTotalFee(value){
               </div>
 
               {/* Patient Information */}
-              <div className="border-t pt-6">
+              <form className="border-t pt-6" onSubmit={(e) => e.preventDefault()}>
                 <h3 className="font-semibold text-gray-900 mb-4 text-xl">Patient Information</h3>
-
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="fullName" className="text-gray-700 font-medium">Full Name</Label>
                     <Input
                       id="fullName"
-                      defaultValue="Ajay Kumar"
+                      value={formData.fullName}
+                      onChange={handleChange}
                       className="bg-gray-50 border-gray-400"
                     />
                   </div>
@@ -308,7 +326,8 @@ function getTotalFee(value){
                     <Input
                       id="email"
                       type="email"
-                      defaultValue="ajay.kumar@gmail.com"
+                      value={formData.email}
+                      onChange={handleChange}
                       className="bg-gray-50 border-gray-400"
                     />
                   </div>
@@ -317,7 +336,8 @@ function getTotalFee(value){
                     <Label htmlFor="phone" className="text-gray-700 font-medium">Phone</Label>
                     <Input
                       id="phone"
-                      defaultValue="+91 9876543210"
+                      value={formData.phone}
+                      onChange={handleChange}
                       className="bg-gray-50 border-gray-400"
                     />
                   </div>
@@ -326,12 +346,16 @@ function getTotalFee(value){
                     <Label htmlFor="reason" className="text-gray-700 font-medium">Reason for Visit</Label>
                     <Textarea
                       id="reason"
+                      value={formData.reason}
+                      onChange={handleChange}
                       placeholder="Brief description of your symptoms"
                       className="mt-1 bg-gray-50 border-gray-400 h-20"
                     />
                   </div>
+
+                  <Button type="button" onClick={handleClick}>Save</Button>
                 </div>
-              </div>
+              </form>
             </Card>
           </div>
 
@@ -342,7 +366,7 @@ function getTotalFee(value){
                 <h2 className="font-semibold text-gray-900 text-xl">Payment Gateway</h2>
                 <Card className="text-right px-2 py-1 rounded-xl bg-white">
                   <span className="text-black text-md font-bold">Amount: </span>
-                  <span className="font-bold text-white">₹{getTotalFee(consultation_fees)}</span>
+                  <span className="font-bold text-primary">₹{getTotalFee(consultation_fees)}</span>
                 </Card>
               </div>
 

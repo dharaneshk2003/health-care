@@ -29,9 +29,6 @@ export const getFilteredDoctors = async (searchQuery) => {
   return filteredDoctors;
 };
 
-
-
-
 export const getAllData = async () => {
   const supabase = await createClient();
   const { data: doctors, error } = await supabase.from('doctors').select('*');
@@ -56,6 +53,26 @@ export const getDataWithId = async(id) =>{
     return null;
   }
   return doctor;
+}
+
+export const patientDetails = async() =>{
+    const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let userDetails = user;
+  return userDetails;
+}
+
+export const getPatientId = async() =>{
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let userDetails = user;
+  return user.id;
 }
 
 

@@ -5,6 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+
 export const signUpActionPatient = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
@@ -99,8 +100,6 @@ export const signUpActionDoctor = async (formData: FormData) => {
   );
 };
 
-
-
 export const signInAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
@@ -147,8 +146,6 @@ export const signInAction = async (formData: FormData) => {
   }
   return redirect("/doctors"); // Default redirect if no specific role match
 };
-
-
 
 export const forgotPasswordAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
@@ -223,3 +220,38 @@ export const signOutAction = async () => {
   await supabase.auth.signOut();
   return redirect("/sign-in");
 };
+
+export const createAppointment = async (prev, formData) => {
+  const supabase = await createClient();
+
+  const formFields = {
+    appointment_date: formData.get('appointment_date')?.toString(),
+    appointment_time: formData.get('appointment_time'),
+    referral_id: formData.get('referral_id') || null,
+    appointment_type: formData.get('appointment_type'),
+    notes: formData.get('notes')?.toString() || null,
+    patient_id: formData.get('patient_id'),
+    doctor_id: formData.get('doctor_id'),
+    consultation_fees: formData.get('consultation_fees'),
+    total_fees: formData.get('total_fees'),
+  };
+
+  const { data, error } = await supabase
+    .from('online_appointments')
+    .insert(formFields)
+    .select()
+    .single();
+
+  console.log(data, error);
+
+  if (error) {
+    return {
+      error: error.message,
+      formFields,
+    };
+  }
+
+  return { success: true, data };
+};
+
+
