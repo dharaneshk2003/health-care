@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { formatISO } from 'date-fns'; 
+import { formatISO } from 'date-fns';
 import { ArrowLeft, Calendar, Clock, User, Info, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,13 +16,15 @@ import { useRouter } from "next/navigation"
 import doctorIMg from "@/components/Images/doctor.png"
 import { getPatientId } from "../app/backend.ts"
 import { createAppointment } from "../app/actions.ts"
+import { useToast } from "../hooks/use-toast.ts"
+import { ToastAction } from "@/components/ui/toast"
 
 // adjust path as needed
 
 export default function UserBookingForm({ doctor, patient }) {
   let patient_id = patient?.id ? patient?.id : null;
   const router = useRouter()
-
+  const { toast } = useToast()
   const [formData, setFormData] = useState({
     date: null as Date | null,
     timeSlot: "",
@@ -115,11 +117,16 @@ export default function UserBookingForm({ doctor, patient }) {
 
 
 
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.date || !formData.timeSlot) {
-      alert("Please select a valid date and time.");
+      toast({
+        title: "Date & Time not valid",
+        description: "Please select a valid date and time.",
+        action: <ToastAction altText="Undo">Undo</ToastAction>,
+      });
+
       return;
     }
 
@@ -146,14 +153,22 @@ const handleSubmit = async (e) => {
     try {
       const result = await createAppointment(null, form);
       if (result.error) {
-        alert(result.error);
+        toast({
+          title: "Unknown Error Occured",
+          description: `${result.error}`,
+          action: <ToastAction altText="Undo">Undo</ToastAction>,
+        });
         return;
       }
       router.push(`/doctors/${id}/payment`);
     } catch (error) {
-      alert('Failed to create appointment. Please try again.');
+      toast({
+          title: "Appointment creation Failed",
+          description: "Failed to create appointment. Please try again.",
+          action: <ToastAction altText="Undo">Undo</ToastAction>,
+        });
     }
-};
+  };
 
 
 
@@ -168,7 +183,7 @@ const handleSubmit = async (e) => {
             <input type="hidden" name="patient_id" value={patient_id ? patient_id : ""} />
             <input type="hidden" name="doctor_id" value={id} />
             <input type="hidden" name="consultation_fees" value={calculateTotal()} />
-            <input type="hidden" name="total_fees" value={getTotalFee(calculateTotal())}/>
+            <input type="hidden" name="total_fees" value={getTotalFee(calculateTotal())} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="date">Select Date</Label>

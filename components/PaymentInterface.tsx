@@ -33,8 +33,13 @@ import paytmImg from "@/components/Images/paytm.png";
 import phonepeIMg from "@/components/Images/phonepe.png";
 import Image from "next/image";
 import { updateAppointmentById } from "../app/actions.ts";
+import { useToast } from "../hooks/use-toast.ts"
+import { ToastAction } from "@/components/ui/toast"
+
+
 export default function PaymentInterface({ doctor, patient, appointment }) {
   let details = patient?.user_metadata;
+  const { toast } = useToast()
   const appointmentType = [
     {
       label: "New Consultation",
@@ -106,20 +111,20 @@ export default function PaymentInterface({ doctor, patient, appointment }) {
   };
 
   // Update formData whenever relevant state changes
-useEffect(() => {
-  const { consultation_fee, total_fee } = calculateFees(selected);
-  setFormData({
-    id: appointment?.id,
-    appointment_date: new Date(date).toISOString().split("T")[0],
-    appointment_time: timeSlot,
-    appointment_type: selected.toLowerCase().replace(/\s+/g, '-'),
-    notes: reason, // use "notes" instead of "reason" if your DB expects "notes"
-    patient_id: patient?.id,
-    doctor_id: doctor?.id,
-    consultation_fees: consultation_fee, // match exact DB field
-    total_fees: total_fee,
-  });
-}, [date, timeSlot, selected, reason, patient?.id, doctor?.id]);
+  useEffect(() => {
+    const { consultation_fee, total_fee } = calculateFees(selected);
+    setFormData({
+      id: appointment?.id,
+      appointment_date: new Date(date).toISOString().split("T")[0],
+      appointment_time: timeSlot,
+      appointment_type: selected.toLowerCase().replace(/\s+/g, '-'),
+      notes: reason, // use "notes" instead of "reason" if your DB expects "notes"
+      patient_id: patient?.id,
+      doctor_id: doctor?.id,
+      consultation_fees: consultation_fee, // match exact DB field
+      total_fees: total_fee,
+    });
+  }, [date, timeSlot, selected, reason, patient?.id, doctor?.id]);
 
 
   const { id, doctor_name, department, ratings, experience, consultation_fees, address, location, available_from_time, available_to_time, available_days, image_url } = doctor;
@@ -172,39 +177,50 @@ useEffect(() => {
 
 
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  const { consultation_fee, total_fee } = calculateFees(selected);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { consultation_fee, total_fee } = calculateFees(selected);
 
-  const payload = {
-    id: appointment?.id,
-    appointment_date: new Date(date).toISOString().split("T")[0],
-    appointment_time: timeSlot,
-    appointment_type: selected.toLowerCase().replace(/\s+/g, '-'),
-    notes: reason,
-    patient_id: patient?.id,
-    doctor_id: doctor?.id,
-    consultation_fees: consultation_fee,
-    total_fees: total_fee,
+    const payload = {
+      id: appointment?.id,
+      appointment_date: new Date(date).toISOString().split("T")[0],
+      appointment_time: timeSlot,
+      appointment_type: selected.toLowerCase().replace(/\s+/g, '-'),
+      notes: reason,
+      patient_id: patient?.id,
+      doctor_id: doctor?.id,
+      consultation_fees: consultation_fee,
+      total_fees: total_fee,
+    };
+
+    if (!payload.id) {
+      toast({
+        title: "ID Missing",
+        description: "Appointment ID is missing. Cannot update.",
+        action: <ToastAction altText="Undo">Undo</ToastAction>,
+      });
+      return;
+    }
+
+    console.log("Submitting form data:", payload);
+
+    const result = await updateAppointmentById(payload);
+
+    if (!result || result.error) {
+      console.error("Failed to update appointment:", result?.error || "Unknown error");
+      toast({
+        title: "Update failed",
+        description: `Update failed: ${result?.error || "Unknown error"}`,
+        action: <ToastAction altText="Undo">Undo</ToastAction>,
+      });
+      return;
+    }
+    toast({
+      title: "Sucessfully Updated",
+      description: "Appointment updated successfully!",
+      action: <ToastAction altText="Undo">Undo</ToastAction>,
+    });
   };
-
-  if (!payload.id) {
-    alert("Appointment ID is missing. Cannot update.");
-    return;
-  }
-
-  console.log("Submitting form data:", payload);
-
-  const result = await updateAppointmentById(payload);
-
-  if (!result || result.error) {
-    console.error("Failed to update appointment:", result?.error || "Unknown error");
-    alert(`Update failed: ${result?.error || "Unknown error"}`);
-    return;
-  }
-
-  alert("Appointment updated successfully!");
-};
 
 
 
