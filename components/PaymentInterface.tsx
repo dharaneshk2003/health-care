@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
   CardContent,
@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { format } from "date-fns"
+import { format, formatISO } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -21,8 +21,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Calendar } from "@/components/ui/calendar"
+} from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
 import { MapPin, Clock, User, Share2, QrCode } from "lucide-react";
 import WalletSection from "@/components/WalletSection";
 import BankSection from "@/components/BankSection";
@@ -32,21 +32,99 @@ import gpayImg from "@/components/Images/gpay.png";
 import paytmImg from "@/components/Images/paytm.png";
 import phonepeIMg from "@/components/Images/phonepe.png";
 import Image from "next/image";
-
-
-export default function PaymentInterface({ doctor, patient }) {
+import { updateAppointmentById } from "../app/actions.ts";
+export default function PaymentInterface({ doctor, patient, appointment }) {
   let details = patient?.user_metadata;
-  const [date, setDate] = React.useState<Date | undefined>(new Date())
-  const [timeSlot, setTimeSlot] = useState<string>("")
-  const [selected, setSelected] = useState("Consultation");
-  const [selectedDraft, setSelectedDraft] = useState("")
+  const appointmentType = [
+    {
+      label: "New Consultation",
+      description: "Doctor consultation for the 1st time",
+      type: "new"
+    },
+    {
+      label: "Follow-up",
+      description: "Follow-up visit after previous consultation",
+      type: "follow-up"
+    },
+    {
+      label: "Emergency",
+      description: "Immediate medical attention required for urgent health concerns",
+      type: "emergency"
+    }
+  ];
+
+  const changeStyle = (kind) => {
+    if (kind == "new-consultation") {
+      return "New Consultation";
+    } else if (kind === "follow-up") {
+      return "Follow-up";
+    } else {
+      return "Emergency";
+    }
+  };
+
+  // Initialize state with values from appointment prop or defaults
+  const [date, setDate] = useState<Date | undefined>(
+    appointment?.appointment_date ? new Date(appointment.appointment_date) : new Date()
+  );
+  const [timeSlot, setTimeSlot] = useState<string>(
+    appointment?.appointment_time || ""
+  );
+  const [selected, setSelected] = useState<string>(
+    changeStyle(appointment?.appointment_type) || "Consultation"
+  );
+  const [selectedDraft, setSelectedDraft] = useState<string>(
+    changeStyle(appointment?.appointment_type) || "Consultation"
+  );
+  const [reason, setReason] = useState<string>(appointment?.notes || "");
+
+  // Sync the formData state with user edits
   const [formData, setFormData] = useState({
-    fullName: details?.name || "",
-    email: details?.email || "",
-    phone: details?.mobile || "",
-    reason: ""
+    appointment_date: date,
+    appointment_time: timeSlot,
+    appointment_type: selected,
+    reason: reason,
+    patient_id: patient?.id,
+    doctor_id: doctor?.id,
+    consultation_fee: doctor?.consultation_fees,
+    total_fee: doctor?.consultation_fees, // or your logic for total_fee
   });
+
+  const calculateFees = (type) => {
+    const baseFee = doctor?.consultation_fees || 0;
+    if (type.toLowerCase().includes("emergency")) {
+      return {
+        consultation_fee: baseFee + 500,
+        total_fee: baseFee + 500 + 100 + getEighteenPercent(baseFee)
+      };
+    } else {
+      return {
+        consultation_fee: baseFee,
+        total_fee: baseFee + 100 + getEighteenPercent(baseFee)
+      };
+    }
+  };
+
+  // Update formData whenever relevant state changes
+useEffect(() => {
+  const { consultation_fee, total_fee } = calculateFees(selected);
+  setFormData({
+    id: appointment?.id,
+    appointment_date: new Date(date).toISOString().split("T")[0],
+    appointment_time: timeSlot,
+    appointment_type: selected.toLowerCase().replace(/\s+/g, '-'),
+    notes: reason, // use "notes" instead of "reason" if your DB expects "notes"
+    patient_id: patient?.id,
+    doctor_id: doctor?.id,
+    consultation_fees: consultation_fee, // match exact DB field
+    total_fees: total_fee,
+  });
+}, [date, timeSlot, selected, reason, patient?.id, doctor?.id]);
+
+
   const { id, doctor_name, department, ratings, experience, consultation_fees, address, location, available_from_time, available_to_time, available_days, image_url } = doctor;
+  const availableDays = available_days;
+
   function generateTimeSlots(fromTime, toTime) {
     const slots = [];
     const [fromHours, fromMinutes] = fromTime.split(':').map(Number);
@@ -62,14 +140,11 @@ export default function PaymentInterface({ doctor, patient }) {
       let minutes = current.getMinutes();
       let ampm = hours >= 12 ? 'PM' : 'AM';
 
-      // Convert to 12-hour format
       hours = hours % 12;
       hours = hours === 0 ? 12 : hours;
       const minutesStr = minutes < 10 ? '0' + minutes : minutes;
 
       slots.push(`${hours}:${minutesStr} ${ampm}`);
-
-      // Add 30 minutes
       current.setMinutes(current.getMinutes() + 30);
     }
 
@@ -77,284 +152,294 @@ export default function PaymentInterface({ doctor, patient }) {
   }
 
   const handleSave = () => {
-    setSelected(selectedDraft)
-    document.getElementById("close-dialog")?.click() // triggers Dialog close
-  }
+    setSelected(selectedDraft);
+    document.getElementById("close-dialog")?.click();
+  };
 
-  const timeSlots = generateTimeSlots("09:00", "17:00");
-
-  const appointmentType = [
-    {
-      label: "Consultation",
-      description: "Regular doctor consultation (30 min)",
-      type: "consultation"
-    },
-    {
-      label: "Follow-up",
-      description: "Follow-up visit after previous consultation (20 min)",
-      type: "followup"
-    },
-    {
-      label: "Comprehensive Check-up",
-      description: "Complete health evaluation (60 min)",
-      type: "checkup"
-    }
-  ];
+  const timeSlots = generateTimeSlots(available_from_time, available_to_time);
 
   function getEighteenPercent(value) {
     return value * 0.18;
   }
 
-
-  function getTotalFee(value) {
-    let gst = getEighteenPercent(value);
-    return value + gst + 100;
-  }
-
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: value
-    }));
+    if (id === "reason") {
+      setReason(value);
+    }
+    // Add other fields if needed
   };
 
-  const handleClick = () => {
-    console.log("Form data:", formData);
+
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  const { consultation_fee, total_fee } = calculateFees(selected);
+
+  const payload = {
+    id: appointment?.id,
+    appointment_date: new Date(date).toISOString().split("T")[0],
+    appointment_time: timeSlot,
+    appointment_type: selected.toLowerCase().replace(/\s+/g, '-'),
+    notes: reason,
+    patient_id: patient?.id,
+    doctor_id: doctor?.id,
+    consultation_fees: consultation_fee,
+    total_fees: total_fee,
   };
+
+  if (!payload.id) {
+    alert("Appointment ID is missing. Cannot update.");
+    return;
+  }
+
+  console.log("Submitting form data:", payload);
+
+  const result = await updateAppointmentById(payload);
+
+  if (!result || result.error) {
+    console.error("Failed to update appointment:", result?.error || "Unknown error");
+    alert(`Update failed: ${result?.error || "Unknown error"}`);
+    return;
+  }
+
+  alert("Appointment updated successfully!");
+};
+
+
+
 
   return (
     <div className="w-[1520px] p-4">
-
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Appointment Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Confirm and Pay Section */}
             <Card className="p-6 bg-white shadow-sm">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-6">Confirm and pay</h2>
-              {/* Doctor Info */}
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-[80px] h-[80px] bg-yellow-100 rounded-lg flex items-center justify-center">
-                  {image_url ? <img src={image_url} className="w-[80px] h-[80px] object-fill border-4 border-primary rounded-lg" /> : <User className="w-8 h-8 text-yellow-600" />}
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 text-lg">{doctor_name}</h3>
-                  <p className="text-gray-600 text-sm">{department}</p>
-                  <div className="flex items-center gap-1 text-white text-sm mt-1">
-                    <MapPin className="w-3 h-3 text-primary" />
-                    <span className="text-primary">{address}</span>
+              <form onSubmit={handleSubmit}>
+                {/* Hidden inputs for backend */}
+                <input type="hidden" name="patient_id" value={patient?.id} />
+                <input type="hidden" name="doctor_id" value={doctor?.id} />
+                <input type="hidden" name="consultation_fee" value={calculateFees(selected).consultation_fee} />
+                <input type="hidden" name="total_fee" value={calculateFees(selected).total_fee} />
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">Confirm and pay</h2>
+                {/* Doctor Info */}
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="w-[80px] h-[80px] bg-yellow-100 rounded-lg flex items-center justify-center">
+                    {image_url ? <img src={image_url} className="w-[80px] h-[80px] object-fill border-4 border-primary rounded-lg" /> : <User className="w-8 h-8 text-yellow-600" />}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 text-lg">{doctor_name}</h3>
+                    <div className="text-gray-600 text-sm">{department}</div>
+                    <div className="flex items-center gap-1 text-white text-sm mt-1">
+                      <MapPin className="w-3 h-3 text-primary" />
+                      <span className="text-primary">{address}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Date and Time */}
-              <div className="grid grid-cols-2 gap-6 mb-6">
-                <div className="bg-gray-100 p-4 rounded-lg">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-gray-500 text-sm uppercase tracking-wide">Select Date</span>
-                    <Dialog>
-                      <DialogTrigger className="text-primary text-sm font-medium underline">Edit</DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>
-                            <div className="font-semibold text-md m-0">Change Date</div>
-                            <div className="text-base text-black mb-1 mt-5">Select a new date</div>
-                            <Input
-                              type="text"
-                              value={date?.toLocaleDateString()}
-                              className="my-2 bg-gray-50 border-gray-400"
-                              onChange={(e) => setDate(new Date(e.target.value))}
-                              readOnly />
-                          </DialogTitle>
-                          <DialogDescription className="border border-gray-500 w-[320px] p-2 rounded-md mx-auto">
-                            <Calendar
-                              mode="single"
-                              selected={date}
-                              onSelect={setDate}
-                              className="rounded-md w-10"
-                            />
-                          </DialogDescription>
-                        </DialogHeader>
-                      </DialogContent>
-                    </Dialog>
+                {/* Date and Time */}
+                <div className="grid grid-cols-2 gap-6 mb-6">
+                  <div className="bg-gray-100 p-4 rounded-lg">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-gray-500 text-sm uppercase tracking-wide">Select Date</span>
+                      <Dialog>
+                        <DialogTrigger className="text-primary text-sm font-medium underline">Edit</DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>
+                              <div className="font-semibold text-md m-0">Change Date</div>
+                              <div className="text-base text-black mb-1 mt-5">Select a new date</div>
+                              <Input
+                                type="text"
+                                value={date?.toLocaleDateString()}
+                                className="my-2 bg-gray-50 border-gray-400"
+                                onChange={(e) => setDate(new Date(e.target.value))}
+                                readOnly />
+                            </DialogTitle>
+                            <DialogDescription className="border border-gray-500 w-[320px] p-2 rounded-md mx-auto">
+                              <Calendar
+                                mode="single"
+                                selected={date}
+                                onSelect={setDate}
+                                className="rounded-md w-10"
+                                disabled={(date) => {
+                                  const today = new Date();
+                                  const isPast = date < today.setHours(0, 0, 0, 0);
+                                  const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+                                  const isUnavailableDay = !availableDays.includes(dayName);
+                                  return isPast || isUnavailableDay;
+                                }}
+                              />
+                            </DialogDescription>
+                          </DialogHeader>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                    <p className="font-medium text-gray-900">{date ? format(date, "PPP") : "Select a date"}</p>
                   </div>
-                  <p className="font-medium text-gray-900">{date ? format(date, "PPP") : "Select a date"}</p>
+                  <div className="bg-gray-100 p-4 rounded-lg">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-gray-500 text-sm uppercase tracking-wide">TIME</span>
+                      <Dialog>
+                        <DialogTrigger className="text-primary text-sm font-medium underline">Edit</DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>
+                              <div className="font-semibold text-md m-0">Change Time</div>
+                              <div className="text-base text-black mb-1 mt-5">Available time slots :</div>
+                            </DialogTitle>
+                            <DialogDescription>
+                              <div className="grid grid-cols-3 gap-2">
+                                {timeSlots.map((slot) => (
+                                  <Button
+                                    key={slot}
+                                    type="button"
+                                    variant={timeSlot === slot ? "default" : "outline"}
+                                    className={`text-xs ${timeSlot === slot ? "bg-primary text-white hover:bg-primary" : ""}`}
+                                    onClick={() => setTimeSlot(slot)}
+                                  >
+                                    {slot}
+                                  </Button>
+                                ))}
+                              </div>
+                            </DialogDescription>
+                          </DialogHeader>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                    <p className="font-medium text-gray-900">{timeSlot ? timeSlot : "Choose time slot"}</p>
+                  </div>
                 </div>
-                <div className="bg-gray-100 p-4 rounded-lg">
+
+                {/* Appointment Type */}
+                <div className="bg-gray-100 p-4 rounded-lg mb-6">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-gray-500 text-sm uppercase tracking-wide">TIME</span>
+                    <span className="text-gray-500 text-sm uppercase tracking-wide">APPOINTMENT TYPE</span>
                     <Dialog>
                       <DialogTrigger className="text-primary text-sm font-medium underline">Edit</DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
                           <DialogTitle>
-                            <div className="font-semibold text-md m-0">Change Time</div>
-                            <div className="text-base text-black mb-1 mt-5">Available time slots :</div>
+                            <div className="font-semibold text-xl m-0">Change Appointment Type</div>
+                            <div className="text-gray-900 text-lg mb-1 mt-5">Select appointment type:</div>
                           </DialogTitle>
                           <DialogDescription>
-                            <div className="grid grid-cols-3 gap-2">
-                              {timeSlots.map((slot) => (
+                            <div className="grid grid-cols-1 gap-2">
+                              {appointmentType.map((type) => (
                                 <Button
-                                  key={slot}
-                                  type="button"
-                                  variant={timeSlot === slot ? "default" : "outline"}
-                                  className={`text-xs ${timeSlot === slot ? "bg-primary text-white hover:bg-primary" : ""}`}
-                                  onClick={() => setTimeSlot(slot)}
+                                  key={type.type}
+                                  variant={selectedDraft === type.label ? "default" : "outline"}
+                                  className={`my-1 h-15 w-full justify-start text-left ${selectedDraft === type.label
+                                    ? "bg-primary hover:bg-primary/60 border text-white !important"
+                                    : "border hover:border-gray-400"}`}
+                                  onClick={() =>
+                                    setSelectedDraft(
+                                      selectedDraft === type.label ? "" : type.label
+                                    )
+                                  }
                                 >
-                                  {slot}
+                                  <div className="p-1">
+                                    <div className="text-xl">{type.label}</div>
+                                    <div className="text-md pb-1">{type.description}</div>
+                                  </div>
                                 </Button>
                               ))}
+                            </div>
+
+                            <div className="flex justify-end gap-2 pt-6">
+                              <DialogTrigger asChild>
+                                <button
+                                  type="button"
+                                  id="close-dialog"
+                                  className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-medium hover:bg-gray-200"
+                                  onClick={() => setSelectedDraft(selected)}
+                                >
+                                  Cancel
+                                </button>
+                              </DialogTrigger>
+                              <button
+                                className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700"
+                                onClick={handleSave}
+                              >
+                                Save
+                              </button>
                             </div>
                           </DialogDescription>
                         </DialogHeader>
                       </DialogContent>
                     </Dialog>
                   </div>
-                  <p className="font-medium text-gray-900">{timeSlot ? timeSlot : "Choose time slot"}</p>
+                  <p className="font-medium text-gray-900">{selected ? selected : ""}</p>
                 </div>
-              </div>
 
-              {/* Appointment Type */}
-              <div className="bg-gray-100 p-4 rounded-lg mb-6">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-gray-500 text-sm uppercase tracking-wide">APPOINTMENT TYPE</span>
-                  <Dialog>
-                    <DialogTrigger className="text-primary text-sm font-medium underline">Edit</DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>
-                          <div className="font-semibold text-xl m-0">Change Appointment Type</div>
-                          <div className="text-gray-900 text-lg mb-1 mt-5">Select appointment type:</div>
-                        </DialogTitle>
-                        <DialogDescription>
-                          <div className="grid grid-cols-1 gap-2">
-                            {appointmentType.map((type) => (
-                              <Button
-                                key={type.type}
-                                variant={selectedDraft === type.label ? "default" : "outline"}
-                                className={`my-1 h-15 w-full justify-start text-left ${selectedDraft === type.label
-                                  ? "bg-primary hover:bg-red-200 border hover:border-red-500  text-white !important"
-                                  : "border hover:border-gray-400"
-                                  }`}
-                                onClick={() =>
-                                  setSelectedDraft(
-                                    selectedDraft === type.label ? "" : type.label
-                                  )
-                                }
-                              >
-                                <div className="p-1">
-                                  <div className="text-xl">{type.label}</div>
-                                  <div className="text-md pb-1">{type.description}</div>
-                                </div>
-                              </Button>
-                            ))}
-                          </div>
-
-                          <div className="flex justify-end gap-2 pt-6">
-                            <DialogTrigger asChild>
-                              <button
-                                type="button"
-                                id="close-dialog"
-                                className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-medium hover:bg-gray-200"
-                                onClick={() => setSelectedDraft(selected)} // reset draft on cancel
-                              >
-                                Cancel
-                              </button>
-                            </DialogTrigger>
-
-                            <button
-                              className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700"
-                              onClick={handleSave}
-                            >
-                              Save
-                            </button>
-                          </div>
-                        </DialogDescription>
-                      </DialogHeader>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-                <p className="font-medium text-gray-900">{selected ? selected : ""}</p>
-
-              </div>
-              {/* Map */}
-              <div className="relative bg-green-100 rounded-lg h-64 mb-4 overflow-hidden">
-                <div className="mb-4">
-                  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224345.89797128353!2d77.04417311948666!3d28.52755440858552!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd5b347eb62d%3A0x52c2b7494e204dce!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1748094810172!5m2!1sen!2sin"
-                    title="hospital-map"
-                    width="100%"
-                    height="200"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    className="rounded-lg"
-                  />
-                </div>
-              </div>
-              {/* Map Actions */}
-              <div className="flex justify-center items-end gap-10 mb-6">
-                <button className="flex items-center gap-2 text-black text-sm bg-gray-200 px-11 py-2 rounded hover:bg-gray-300 transition-colors">
-                  <MapPin className="w-4 h-4" />
-                  Get Directions
-                </button>
-                <button className="flex items-center gap-2 text-black text-sm bg-gray-200 px-11 py-2 rounded hover:bg-gray-300 transition-colors">
-                  <Share2 className="w-4 h-4" />
-                  Share Location
-                </button>
-              </div>
-
-              {/* Patient Information */}
-              <form className="border-t pt-6" onSubmit={(e) => e.preventDefault()}>
-                <h3 className="font-semibold text-gray-900 mb-4 text-xl">Patient Information</h3>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="fullName" className="text-gray-700 font-medium">Full Name</Label>
-                    <Input
-                      id="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      className="bg-gray-50 border-gray-400"
+                {/* Map */}
+                <div className="relative bg-green-100 rounded-lg h-64 mb-4 overflow-hidden">
+                  <div className="mb-4">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224345.89797128353!2d77.04417311948666!3d28.52755440858552!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd5b347eb62d%3A0x52c2b7494e204dce!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1748094810172!5m2!1sen!2sin"
+                      title="hospital-map"
+                      width="100%"
+                      height="200"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      className="rounded-lg"
                     />
                   </div>
-
-                  <div>
-                    <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="bg-gray-50 border-gray-400"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="phone" className="text-gray-700 font-medium">Phone</Label>
-                    <Input
-                      id="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="bg-gray-50 border-gray-400"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="reason" className="text-gray-700 font-medium">Reason for Visit</Label>
-                    <Textarea
-                      id="reason"
-                      value={formData.reason}
-                      onChange={handleChange}
-                      placeholder="Brief description of your symptoms"
-                      className="mt-1 bg-gray-50 border-gray-400 h-20"
-                    />
-                  </div>
-
-                  <Button type="button" onClick={handleClick}>Save</Button>
                 </div>
+
+                {/* Map Actions */}
+                <div className="flex justify-center items-end gap-10 mb-6">
+                  <button className="flex items-center gap-2 text-black text-sm bg-gray-200 px-11 py-2 rounded hover:bg-gray-300 transition-colors">
+                    <MapPin className="w-4 h-4" />
+                    Get Directions
+                  </button>
+                  <button className="flex items-center gap-2 text-black text-sm bg-gray-200 px-11 py-2 rounded hover:bg-gray-300 transition-colors">
+                    <Share2 className="w-4 h-4" />
+                    Share Location
+                  </button>
+                </div>
+
+                {/* Patient Information */}
+                <div className="border-t pt-6">
+                  <h3 className="font-semibold text-gray-900 mb-4 text-xl">Patient Information</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="fullName" className="text-gray-700 font-medium">Full Name</Label>
+                      <Input
+                        id="fullName"
+                        value={details?.name}
+                        readOnly
+                        className="bg-gray-100"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="phoneNumber" className="text-gray-700 font-medium">Phone Number</Label>
+                      <Input
+                        id="phoneNumber"
+                        value={details?.mobile}
+                        readOnly
+                        className="bg-gray-100"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="reason" className="text-gray-700 font-medium">Reason for Visit</Label>
+                      <Textarea
+                        id="reason"
+                        value={reason}
+                        onChange={handleChange}
+                        placeholder="Briefly describe your reason for the appointment"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full bg-primary text-white hover:bg-red-500 mt-6">
+                  Edit Appointment Details
+                </Button>
               </form>
             </Card>
           </div>
@@ -366,7 +451,7 @@ export default function PaymentInterface({ doctor, patient }) {
                 <h2 className="font-semibold text-gray-900 text-xl">Payment Gateway</h2>
                 <Card className="text-right px-2 py-1 rounded-xl bg-white">
                   <span className="text-black text-md font-bold">Amount: </span>
-                  <span className="font-bold text-primary">₹{getTotalFee(consultation_fees)}</span>
+                  <span className="font-bold text-primary">₹{calculateFees(selected).total_fee}</span>
                 </Card>
               </div>
 
@@ -374,7 +459,7 @@ export default function PaymentInterface({ doctor, patient }) {
               <Card className="space-y-3 mb-6 text-sm p-4">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Consultation Fee</span>
-                  <span className="text-gray-900">₹{consultation_fees}</span>
+                  <span className="text-gray-900">₹{calculateFees(selected).consultation_fee}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Booking Fee</span>
@@ -382,11 +467,11 @@ export default function PaymentInterface({ doctor, patient }) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">GST (18%)</span>
-                  <span className="text-gray-900">₹{getEighteenPercent(consultation_fees)}</span>
+                  <span className="text-gray-900">₹{getEighteenPercent(calculateFees(selected).consultation_fee)}</span>
                 </div>
                 <div className="border-t pt-3 flex justify-between font-semibold">
                   <span>Total</span>
-                  <span>₹{getTotalFee(consultation_fees)}</span>
+                  <span>₹{calculateFees(selected).total_fee}</span>
                 </div>
               </Card>
 
@@ -465,7 +550,7 @@ export default function PaymentInterface({ doctor, patient }) {
 
               {/* Pay Button */}
               <Button className="w-full bg-primary hover:bg-primary text-white py-3 text-lg font-semibold mb-4">
-                Pay ₹{getTotalFee(consultation_fees)}
+                Pay ₹{calculateFees(selected).total_fee}
               </Button>
 
               {/* Security Icons */}

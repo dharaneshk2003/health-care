@@ -76,3 +76,42 @@ export const getPatientId = async() =>{
 }
 
 
+export const getAppointment = async (doctorId) => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('online_appointments')
+    .select('*')
+    .eq('doctor_id', doctorId)
+    .order('id', { ascending: false }) // latest first
+    .limit(1)
+    .single(); // get a single row instead of an array
+
+  if (error) {
+    console.error("Error fetching latest appointment by doctor ID:", error.message);
+    return null;
+  }
+
+  return data;
+};
+
+
+export const getOfflineAppointments = async () => {
+  const supabase = await createClient();
+  const { data: offline_appointments, error } = await supabase.from('offline_appointments').select('*');
+  if (error) {
+    console.error("Error fetching offline appointments :", error.message);
+    return [];
+  }
+  return offline_appointments;
+};
+
+
+
+
+
+
+
+
+
+

@@ -20,8 +20,7 @@ import { createAppointment } from "../app/actions.ts"
 // adjust path as needed
 
 export default function UserBookingForm({ doctor, patient }) {
-  let patient_id = patient?.id;
-  let { age, email, gender, mobile, name } = patient?.user_metadata;
+  let patient_id = patient?.id ? patient?.id : null;
   const router = useRouter()
 
   const [formData, setFormData] = useState({
@@ -29,7 +28,7 @@ export default function UserBookingForm({ doctor, patient }) {
     timeSlot: "",
     referralId: "",
     notes: "",
-    appointmentType: "new",
+    appointmentType: "new-consultation",
   });
   const [showMap, setShowMap] = useState(true);
   const { date, timeSlot, referralId, notes, appointmentType } = formData;
@@ -166,7 +165,7 @@ const handleSubmit = async (e) => {
         <div className="lg:col-span-2 mt-4">
           <h1 className="text-2xl font-bold mb-6">Book Your Appointment</h1>
           <form className="space-y-6" onSubmit={handleSubmit}>
-            <input type="hidden" name="patient_id" value={patient_id} />
+            <input type="hidden" name="patient_id" value={patient_id ? patient_id : ""} />
             <input type="hidden" name="doctor_id" value={id} />
             <input type="hidden" name="consultation_fees" value={calculateTotal()} />
             <input type="hidden" name="total_fees" value={getTotalFee(calculateTotal())}/>
@@ -259,8 +258,8 @@ const handleSubmit = async (e) => {
                 className="flex flex-col space-y-1"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="new" id="new" />
-                  <Label htmlFor="new">New Consultation</Label>
+                  <RadioGroupItem value="new-consultation" id="new-consultation" />
+                  <Label htmlFor="new-consultation">New Consultation</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="follow-up" id="follow-up" />

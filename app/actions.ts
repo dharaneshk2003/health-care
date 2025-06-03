@@ -255,3 +255,70 @@ export const createAppointment = async (prev, formData) => {
 };
 
 
+export const updateAppointmentById = async (payload) => {
+  const supabase = await createClient();
+
+  if (!payload?.id) {
+    console.error("Missing appointment ID in payload");
+    return { data: null, error: "Missing appointment ID" };
+  }
+
+  const { id, ...updateFields } = payload;
+
+  try {
+    const { data, error } = await supabase
+      .from('online_appointments')
+      .update(updateFields)
+      .eq('id', id)
+      .select()
+      .maybeSingle(); // ✅ won't error if 0 rows match
+    if (error) {
+      console.error("Error updating appointment:", error.message);
+      return { data: null, error: error.message };
+    }
+
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error while updating appointment:", err);
+    return { data: null, error: "Unexpected error during update" };
+  }
+};
+
+
+
+
+export const createOfflineAppointment = async (prev: any, formData: FormData) => {
+  const supabase = await createClient();
+
+  const formFields = {
+    offline_id: formData.get("offline_id")?.toString(),
+    name: formData.get("name")?.toString(),
+    phone: formData.get("phone")?.toString(),
+    age: Number(formData.get("age")),
+    gender: formData.get("gender")?.toString(),
+    status: formData.get("status")?.toString(),
+    doctor: formData.get("doctor")?.toString(),
+    specialty: formData.get("specialty")?.toString(),
+    date: formData.get("date")?.toString(),
+    time: formData.get("time")?.toString(),
+    notes: formData.get("notes")?.toString() || null,
+    amount: Number(formData.get("amount")),
+  };
+
+  const { data, error } = await supabase
+    .from("offline_appointments")
+    .insert(formFields)
+    .select()
+    .single();
+
+  if (error) {
+    return {
+      error: error.message,
+      formFields,
+    };
+  }
+
+  return { success: true, data };
+};
+
+

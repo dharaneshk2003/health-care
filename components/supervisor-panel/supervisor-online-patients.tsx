@@ -11,72 +11,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { createOfflineAppointment } from "../../app/actions.ts"
+import { useToast } from "../../hooks/use-toast.ts"
+import { ToastAction } from "@/components/ui/toast"
+export function SupervisorOnlinePatients({ list }) {
 
-export function SupervisorOnlinePatients() {
   const randomSixDigit = Math.floor(Math.random() * (999999 - 111111 + 1)) + 111111;
-  const onlinePatients = [
-    {
-      id: "HSS-123456",
-      name: "Rahul Sharma",
-      age: 45,
-      gender: "Male",
-      phone: "+91 98765 43210",
-      doctor: "Dr. Rajesh Kumar",
-      specialty: "Cardiology",
-      hospital: "Arogya Multi-Specialty Hospital",
-      date: "May 15, 2023",
-      time: "10:30",
-      status: "confirmed",
-      amount: 1200,
-    },
-    {
-      id: "HSS-789012",
-      name: "Priya Patel",
-      age: 32,
-      gender: "Female",
-      phone: "+91 87654 32109",
-      doctor: "Dr. Priya Sharma",
-      specialty: "Dermatology",
-      hospital: "Skin & Care Clinic",
-      date: "June 22, 2023",
-      time: "14:15",
-      status: "pending",
-      amount: 1000,
-    },
-    {
-      id: "HSS-345678",
-      name: "Amit Singh",
-      age: 28,
-      gender: "Male",
-      phone: "+91 76543 21098",
-      doctor: "Dr. Vikram Singh",
-      specialty: "Orthopedic",
-      hospital: "Joint Care Center",
-      date: "July 8, 2023",
-      time: "11:00",
-      status: "confirmed",
-      amount: 1500,
-    },
-    {
-      id: "HSS-901234",
-      name: "Sneha Gupta",
-      age: 35,
-      gender: "Female",
-      phone: "+91 65432 10987",
-      doctor: "Dr. Ananya Patel",
-      specialty: "Pediatrics",
-      hospital: "Children's Wellness Center",
-      date: "July 12, 2023",
-      time: "9:45",
-      status: "pending",
-      amount: 900,
-    },
-  ]
   const [searchQuery, setSearchQuery] = useState("")
-  const [patientsData,setPatientsData] = useState(onlinePatients);
+  const [patientsData, setPatientsData] = useState(list);
   const [isAddPatientOpen, setIsAddPatientOpen] = useState(false)
   const [formData, setFormData] = useState({
-    id:`HSS-${randomSixDigit}`,
+    offline_id: `POF-${randomSixDigit}`,
     name: "",
     phone: "",
     age: 0,
@@ -87,48 +32,102 @@ export function SupervisorOnlinePatients() {
     date: "",
     time: "",
     notes: "",
-    amount : Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000
+    amount: Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000
   });
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
 
 
- const handleChange = (field, value) => {
-  setFormData((prev) => ({
-    ...prev,
-    [field]: field === "age" ? Number(value) : value,
-  }));
-};
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: field === "age" ? Number(value) : value,
+    }));
+  };
 
-const timeFormatForFrontEnd = (time) => {
-  const [hour, minute] = time.split(":").map(Number);
-  const period = hour >= 12 ? "PM" : "AM";
-  const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
-  return `${formattedHour}:${minute.toString().padStart(2, "0")} ${period}`;
-};
+  const timeFormatForFrontEnd = (time) => {
+    const [hour, minute] = time.split(":").map(Number);
+    const period = hour >= 12 ? "PM" : "AM";
+    const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
+    return `${formattedHour}:${minute.toString().padStart(2, "0")} ${period}`;
+  };
 
+  const { toast } = useToast()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
+    if (!formData.date || !formData.time) {
+      toast({
+        title: "Missing information",
+        description: "Please select a valid date and time.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  const handleSubmit = (e) => {
-  e.preventDefault();
-  setPatientsData((prev) => [...prev, formData]);
-  console.log(formData);
-  setIsAddPatientOpen(false);
-};
+    const payload = {
+      offline_id: formData.offline_id,
+      name: formData.name,
+      phone: formData.phone,
+      age: formData.age,
+      gender: formData.gender,
+      status: formData.status,
+      doctor: formData.doctor,
+      specialty: formData.specialty,
+      date: formData.date,
+      time: formData.time,
+      notes: formData.notes || "",
+      amount: formData.amount,
+    };
 
+    const form = new FormData();
+    Object.entries(payload).forEach(([key, value]) => {
+      form.append(key, String(value));
+    });
 
-  
+    try {
+      const result = await createOfflineAppointment(null, form);
+      if (result.error) {
+        toast({
+          title: "Submission failed",
+          description: result.error,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Added Successfully",
+        description: "New patient data has been updated.",
+        action: <ToastAction altText="Undo">Undo</ToastAction>,
+      });
+
+      setIsAddPatientOpen(false);
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to create offline appointment.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const filteredPatients = patientsData.filter(
     (patient) =>
       patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patient.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      patient.offline_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       patient.doctor.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Online Patient List</h1>
+        <h1 className="text-2xl font-bold">Offline Appointment System</h1>
 
         <div className="flex items-center space-x-2">
           <div className="relative">
@@ -360,7 +359,7 @@ const timeFormatForFrontEnd = (time) => {
                   <span>{patient.phone}</span>
                 </div>
                 <div className="pt-2 mt-2 border-t">
-                  <p className="text-xs text-muted-foreground">Booking ID: {patient.id}</p>
+                  <p className="text-xs text-muted-foreground">Booking ID : {patient.offline_id}</p>
                   <p className="font-medium mt-1">Amount: ₹{patient.amount}</p>
                 </div>
               </div>
@@ -392,6 +391,8 @@ const timeFormatForFrontEnd = (time) => {
           </Card>
         ))}
       </div>
+
+      {showSuccessAlert && <AlertSuccess />}
 
       {filteredPatients.length === 0 && (
         <div className="text-center py-10">

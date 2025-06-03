@@ -8,6 +8,7 @@ import Link from "next/link";
 import "./globals.css";
 import Image from "next/image";
 import logo from "../components/Images/logo.png"
+import { Toaster } from "@/components/ui/toaster"
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -66,6 +67,7 @@ export default function RootLayout({
               <div className="flex flex-col gap-5 p-0 m-0">
                 {children}
               </div>
+              <Toaster />
               <footer className="w-full border-t bg-background pt-5 pb-4 mt-auto">
                 <nav
                   className="flex flex-wrap justify-center items-center gap-8 text-sm text-muted-foreground"
@@ -76,7 +78,7 @@ export default function RootLayout({
                       key={link.name}
                       href={link.href}
                       className={
-                        "relative font-medium transition-colors after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-1/2 after:h-[2px] after:bg-primary after:rounded-full after:transition-all after:duration-200 hover:after:w-full hover:text-white"
+                        "relative font-medium transition-colors after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-1/2 after:h-[2px] after:bg-primary after:rounded-full after:transition-all after:duration-200 hover:after:w-full hover:text-primary"
                       }
                       style={{
                         paddingBottom: "2px",

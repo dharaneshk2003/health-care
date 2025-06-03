@@ -10,7 +10,27 @@ import { SupervisorHeader } from "./supervisor-header"
 
 type SupervisorView = "onlinePatients" | "staffManagement" | "analytics"
 
-export function SupervisorPanel() {
+interface Appointment {
+  id: number;
+  offline_id: string;
+  name: string;
+  age: number;
+  gender: 'Male' | 'Female' | 'Other'; // you can expand this if needed
+  phone: string;
+  doctor: string;
+  specialty: string;
+  hospital: string;
+  date: string;  // ISO format date, e.g., '2023-05-15'
+  time: string;  // e.g., '10:30:00'
+  status: 'confirmed' | 'pending' | 'cancelled'; // Add other statuses if needed
+  amount: number;
+}
+
+interface SupervisorPanelProps {
+  appointmentList: Appointment[];
+}
+
+export function SupervisorPanel({ appointmentList }: SupervisorPanelProps) {
   const [currentView, setCurrentView] = useState<SupervisorView>("onlinePatients")
 
   const navigateTo = (view: SupervisorView) => {
@@ -23,7 +43,7 @@ export function SupervisorPanel() {
         <SupervisorSidebar currentView={currentView} onNavigate={navigateTo} />
 
         <main className="flex-1 py-0 pl-2">
-          {currentView === "onlinePatients" && <SupervisorOnlinePatients />}
+          {currentView === "onlinePatients" && <SupervisorOnlinePatients list= {appointmentList} />}
           {currentView === "staffManagement" && <SupervisorStaffManagement />}
           {currentView === "analytics" && <SupervisorAnalytics />}
         </main>
