@@ -35,9 +35,11 @@ import Image from "next/image";
 import { updateAppointmentById } from "../app/actions.ts";
 import { useToast } from "../hooks/use-toast.ts"
 import { ToastAction } from "@/components/ui/toast"
+import { useRouter } from 'next/navigation'; 
 
 
 export default function PaymentInterface({ doctor, patient, appointment }) {
+  const router = useRouter();
   let details = patient?.user_metadata;
   const { toast } = useToast()
   const appointmentType = [
@@ -217,10 +219,23 @@ export default function PaymentInterface({ doctor, patient, appointment }) {
     }
     toast({
       title: "Sucessfully Updated",
-      description: "Appointment updated successfully!",
+      description: "Details updated successfully!",
       action: <ToastAction altText="Undo">Undo</ToastAction>,
     });
   };
+
+const handlePayment = () => {
+  toast({
+    title: "Successfully Booked",
+    description: "Appointment booked successfully!",
+    action: <ToastAction altText="Undo">Undo</ToastAction>,
+  });
+
+  // Wait 1.5–2 seconds before navigating
+  setTimeout(() => {
+    router.push('/doctors');
+  }, 1500);
+};
 
 
 
@@ -565,7 +580,7 @@ export default function PaymentInterface({ doctor, patient, appointment }) {
               </div>
 
               {/* Pay Button */}
-              <Button className="w-full bg-primary hover:bg-primary text-white py-3 text-lg font-semibold mb-4">
+              <Button className="w-full bg-primary hover:bg-primary text-white py-3 text-lg font-semibold mb-4" onClick={handlePayment}>
                 Pay ₹{calculateFees(selected).total_fee}
               </Button>
 

@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { createOfflineAppointment } from "../../app/actions.ts"
 import { useToast } from "../../hooks/use-toast.ts"
 import { ToastAction } from "@/components/ui/toast"
+import { useRouter } from 'next/navigation'; 
 export function SupervisorOnlinePatients({ list }) {
 
   const randomSixDigit = Math.floor(Math.random() * (999999 - 111111 + 1)) + 111111;
@@ -105,7 +106,7 @@ export function SupervisorOnlinePatients({ list }) {
       setIsAddPatientOpen(false);
 
       setTimeout(() => {
-        window.location.reload();
+         router.refresh();
       }, 2000);
     } catch (error) {
       console.error(error);
