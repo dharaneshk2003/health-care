@@ -75,6 +75,23 @@ export const getPatientId = async() =>{
   return user.id;
 }
 
+export const getOnlineAppointments = async () => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('online_appointments')
+    .select('*')
+    .order('id', { ascending: false }); // Optional: sort latest first
+
+  if (error) {
+    console.error("Error fetching appointment list:", error.message);
+    return null;
+  }
+
+  return data;
+};
+
+
 
 export const getAppointment = async (doctorId) => {
   const supabase = await createClient();
@@ -94,6 +111,9 @@ export const getAppointment = async (doctorId) => {
 
   return data;
 };
+
+
+
 
 
 export const getOfflineAppointments = async () => {

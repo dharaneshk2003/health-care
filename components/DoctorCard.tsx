@@ -13,7 +13,7 @@ import { Button } from "../components/ui/button"
 import { Star } from "lucide-react";
 import { FaStar } from "react-icons/fa";
 
-export default function DoctorCard({ doctors }) {
+export default function DoctorCard({ doctors}) {
     const router = useRouter();
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">

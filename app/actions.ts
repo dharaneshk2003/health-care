@@ -236,13 +236,14 @@ export const createAppointment = async (prev, formData) => {
     total_fees: formData.get('total_fees'),
   };
 
-  const { data, error } = await supabase
+  // ✅ Insert new appointment
+  const { data: inserted, error } = await supabase
     .from('online_appointments')
     .insert(formFields)
     .select()
     .single();
 
-  console.log(data, error);
+  console.log("Inserted:", inserted, "Error:", error);
 
   if (error) {
     return {
@@ -251,8 +252,30 @@ export const createAppointment = async (prev, formData) => {
     };
   }
 
-  return { success: true, data };
+  // ✅ Clean up duplicates (keep only the latest)
+  const { data: duplicates, error: fetchError } = await supabase
+    .from('online_appointments')
+    .select('id')
+    .eq('patient_id', formFields.patient_id)
+    .eq('doctor_id', formFields.doctor_id)
+    .neq('id', inserted.id); // Exclude the newly inserted row
+
+  if (!fetchError && duplicates.length > 0) {
+    const duplicateIdsToDelete = duplicates.map(d => d.id);
+
+    const { error: deleteError } = await supabase
+      .from('online_appointments')
+      .delete()
+      .in('id', duplicateIdsToDelete);
+
+    if (deleteError) {
+      console.warn("Cleanup failed for duplicates:", deleteError.message);
+    }
+  }
+
+  return { success: true, data: inserted };
 };
+
 
 
 export const updateAppointmentById = async (payload) => {
@@ -266,23 +289,48 @@ export const updateAppointmentById = async (payload) => {
   const { id, ...updateFields } = payload;
 
   try {
-    const { data, error } = await supabase
+    // ✅ Update the specific appointment
+    const { data: updated, error } = await supabase
       .from('online_appointments')
       .update(updateFields)
       .eq('id', id)
       .select()
-      .maybeSingle(); // ✅ won't error if 0 rows match
+      .maybeSingle();
+
     if (error) {
       console.error("Error updating appointment:", error.message);
       return { data: null, error: error.message };
     }
 
-    return { data, error: null };
+    // ✅ Clean up duplicates (same patient_id and doctor_id, excluding this id)
+    const { data: duplicates, error: fetchError } = await supabase
+      .from('online_appointments')
+      .select('id')
+      .eq('patient_id', updateFields.patient_id)
+      .eq('doctor_id', updateFields.doctor_id)
+      .neq('id', id); // exclude updated one
+
+    if (!fetchError && duplicates.length > 0) {
+      const duplicateIdsToDelete = duplicates.map(d => d.id);
+
+      const { error: deleteError } = await supabase
+        .from('online_appointments')
+        .delete()
+        .in('id', duplicateIdsToDelete);
+
+      if (deleteError) {
+        console.warn("Duplicate cleanup failed after update:", deleteError.message);
+      }
+    }
+
+    return { data: updated, error: null };
+
   } catch (err) {
-    console.error("Unexpected error while updating appointment:", err);
+    console.error("Unexpected error during update:", err);
     return { data: null, error: "Unexpected error during update" };
   }
 };
+
 
 
 
