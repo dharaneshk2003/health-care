@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { getDataWithId, patientDetails } from '../../backend.ts';
 import UserBookingForm from '../../../components/UserBookingForm.tsx';
 
+
 export default async function DoctorDetailsPage({ params }: { params: { id: string } }) {
   const { id } = await params; // ✅ Fix here
 

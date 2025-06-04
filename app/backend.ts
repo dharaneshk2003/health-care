@@ -40,7 +40,7 @@ export const getAllData = async () => {
 };
 
 
-export const getDataWithId = async(id) =>{
+export const getDataWithId = async (id) => {
   const supabase = await createClient();
   const { data: doctor, error } = await supabase
     .from('doctors')
@@ -55,8 +55,8 @@ export const getDataWithId = async(id) =>{
   return doctor;
 }
 
-export const patientDetails = async() =>{
-    const supabase = await createClient();
+export const patientDetails = async () => {
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -65,7 +65,7 @@ export const patientDetails = async() =>{
   return userDetails;
 }
 
-export const getPatientId = async() =>{
+export const getPatientId = async () => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -126,6 +126,36 @@ export const getOfflineAppointments = async () => {
   return offline_appointments;
 };
 
+
+
+
+export const LoggedInuserAppointments = async () => { 
+  const supabase = await createClient();
+
+  // Get the logged-in user
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return [];
+  }
+
+  // Fetch all appointments booked by the logged-in user
+  const { data, error } = await supabase
+    .from('online_appointments')
+    .select('*')
+    .eq('patient_id', user.id)  // or .eq('patient_id', user.id) if your table uses `patient_id`
+    .order('id', { ascending: false });
+
+  if (error) {
+    console.error("Error fetching appointments for user:", error.message);
+    return null;
+  }
+
+  return data; // an array of appointments
+};
 
 
 

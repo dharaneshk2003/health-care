@@ -1,5 +1,4 @@
 "use client";
-import { createClient } from "../utils/supabase/server";
 import { useRouter } from 'next/navigation';
 import {
     Card,
@@ -13,7 +12,23 @@ import { Button } from "../components/ui/button"
 import { Star } from "lucide-react";
 import { FaStar } from "react-icons/fa";
 
-export default function DoctorCard({ doctors}) {
+type DoctorCardProps = {
+    doctors: any[]; // Replace with accurate type if you have one
+    user: any;
+    role: string;
+    engagement: string,
+    engagementList: any[];
+};
+export default function DoctorCard({ doctors, user, role, engagement, engagementList }: DoctorCardProps) {
+    const handleSubmit = (id) => {
+        router.push(`/doctors/${id}`);
+        console.log(id)
+        console.log("user : ", user)
+        console.log("role : ", role)
+        console.log("engagement :", engagement)
+        console.log("engagement list", engagementList);
+    }
+
     const router = useRouter();
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -66,7 +81,23 @@ export default function DoctorCard({ doctors}) {
                         <p className="mx-0 font-bold text-lg mt-1">Consultation Fee : ₹{doctor.consultation_fees}</p>
                     </CardContent>
                     <CardFooter className="pt-2">
-                        <Button className="bg-primary text-white mt-0 hover:bg-red-500 hover:text-white" onClick={()=> router.push(`/doctors/${doctor.id}`)}>Book Appointment</Button>
+                        {/* <Button className="bg-primary text-white mt-0 hover:bg-red-500 hover:text-white" onClick={()=>handleSubmit(doctor.id)}>{role=="doctor" ? "Give Referral" : "Book Appointment"}</Button> */}
+                        {engagement === 'appointment' &&
+                            engagementList.some((item) => item.doctor_id === doctor.id) ? (
+                            <Button
+                                className="bg-green-500 text-white mt-0 cursor-not-allowed"
+                                disabled
+                            >
+                                Appointment Booked
+                            </Button>
+                        ) : (
+                            <Button
+                                className="bg-primary text-white mt-0 hover:bg-red-500 hover:text-white"
+                                onClick={() => handleSubmit(doctor.id)}
+                            >
+                                {role === 'doctor' ? 'Give Referral' : 'Book Appointment'}
+                            </Button>
+                        )}
                     </CardFooter>
                 </Card>
             ))}

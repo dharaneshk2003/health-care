@@ -54,7 +54,7 @@ export function SupervisorAnalytics() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Referal Fees Generated</CardDescription>
+            <CardDescription>Refferal Fees Generated</CardDescription>
             <CardTitle className="text-2xl">₹3,43,850</CardTitle>
           </CardHeader>
           <CardContent>

@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { FormMessage } from "@/components/form-message";
 import type { Message } from "@/components/form-message";
+import { SubmitButton } from "@/components/submit-button";
 
 export default function DoctorLoginForm({ message }: { message: Message }) {
     const [showPassword, setShowPassword] = useState(false);
@@ -56,9 +57,9 @@ export default function DoctorLoginForm({ message }: { message: Message }) {
                             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </Button>
                     </div>
-                    <Button type="submit" className="w-full text-white mt-4">
+                    <SubmitButton pendingText="Signing in..." className="w-full text-white mt-4">
                         Sign in
-                    </Button>
+                    </SubmitButton>
                     <FormMessage message={message} />
                 </form>
             </CardContent>

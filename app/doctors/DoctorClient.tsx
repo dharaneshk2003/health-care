@@ -1,15 +1,25 @@
+// DoctorClient.tsx
 'use client';
 
 import { useState } from 'react';
 import DoctorCard from '../../components/DoctorCard';
 import AirbnbSearchBar from '../../components/ui/AirbnbSearchBar.tsx';
-import { UserCategoryFilters } from '../../components/ui/UserCategoryFilters'; // update path as needed
+import { UserCategoryFilters } from '../../components/ui/UserCategoryFilters';
 
-export default function DoctorClient({ doctorList }) {
+type DoctorClientProps = {
+  doctorList: any[]; // Replace with correct type if available
+  role: any;
+  user: any;
+  engagement : any;
+  engagementList : any[];
+};
+
+export default function DoctorClient({ doctorList, role, user,engagement,engagementList }: DoctorClientProps) {
   const [filteredDoctors, setFilteredDoctors] = useState(doctorList);
   const [noMatchFound, setNoMatchFound] = useState(false);
   const [searched, setSearched] = useState(false);
-  const [departmentValue, setDepartmentValue] = useState("All"); // 🆕 selected department
+  const [departmentValue, setDepartmentValue] = useState("All");
+
 
   const handleFilterData = async (filters) => {
     setSearched(true);
@@ -40,20 +50,17 @@ export default function DoctorClient({ doctorList }) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Search bar */}
       <AirbnbSearchBar onSubmit={handleFilterData} />
-      {/* Category filter */}
       <UserCategoryFilters onFilterChange={(departmentId) => setDepartmentValue(departmentId)} />
-      
-      {/* No match message */}
+
       {noMatchFound && searched && departmentValue !== "All" && (
         <p className="text-center text-red-500 font-semibold">
           No doctors matched your requirements. Showing All available doctors.
         </p>
       )}
 
-      {/* Doctor cards */}
-      <DoctorCard doctors={filteredDoctors} />
+      {/* ✅ Pass user and role to DoctorCard */}
+      <DoctorCard doctors={filteredDoctors} user={user} role={role} engagement={engagement} engagementList={engagementList}/>
     </div>
   );
 }
