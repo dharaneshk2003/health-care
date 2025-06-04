@@ -76,14 +76,6 @@ export const updateSession = async (request: NextRequest) => {
   if((request.nextUrl.pathname === "/sign-up") && (role==="doctor" || !user)){
     return NextResponse.redirect(new URL("/sign-up/doctor", request.url));
   }
-
-
-   if((request.nextUrl.pathname.startsWith("/doctors")) && (role==="doctor")){
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-
-
-
     return response;
   } catch (e) {
     // If you are here, a Supabase client could not be created!

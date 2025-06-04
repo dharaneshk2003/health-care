@@ -11,6 +11,7 @@ import {
 import { Button } from "../components/ui/button"
 import { Star } from "lucide-react";
 import { FaStar } from "react-icons/fa";
+import RefferalDialogue from './RefferalDialogue.tsx';
 
 type DoctorCardProps = {
     doctors: any[]; // Replace with accurate type if you have one
@@ -20,15 +21,14 @@ type DoctorCardProps = {
     engagementList: any[];
 };
 export default function DoctorCard({ doctors, user, role, engagement, engagementList }: DoctorCardProps) {
-    const handleSubmit = (id) => {
+    const handleAppointment = (id) => {
         router.push(`/doctors/${id}`);
-        console.log(id)
-        console.log("user : ", user)
-        console.log("role : ", role)
-        console.log("engagement :", engagement)
-        console.log("engagement list", engagementList);
+        // console.log(id)
+        // console.log("user : ", user)
+        // console.log("role : ", role)
+        // console.log("engagement :", engagement)
+        // console.log("engagement list", engagementList);
     }
-
     const router = useRouter();
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -90,14 +90,23 @@ export default function DoctorCard({ doctors, user, role, engagement, engagement
                             >
                                 Appointment Booked
                             </Button>
+                        ) : role === 'doctor' ? (
+                            // <Button
+                            //     className="bg-primary text-white mt-0 hover:bg-red-500 hover:text-white"
+                            //     onClick={() => handleReferralDialog(doctor.id)}
+                            // >
+                            //     Refer to
+                            // </Button>
+                            <RefferalDialogue doctor={doctor}/>
                         ) : (
                             <Button
                                 className="bg-primary text-white mt-0 hover:bg-red-500 hover:text-white"
-                                onClick={() => handleSubmit(doctor.id)}
+                                onClick={() => handleAppointment(doctor.id)}
                             >
-                                {role === 'doctor' ? 'Give Referral' : 'Book Appointment'}
+                                Book Appointment
                             </Button>
                         )}
+
                     </CardFooter>
                 </Card>
             ))}

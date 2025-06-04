@@ -21,8 +21,6 @@ export default async function DoctorPage() {
     engagementList = await LoggedInuserAppointments();
   }
 
-  console.log(`Engagement (${engagement}) list:`, engagementList);
-
   return (
     <DoctorClient
       doctorList={doctorList}
