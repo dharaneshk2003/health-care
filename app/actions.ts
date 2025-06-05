@@ -277,7 +277,6 @@ export const createAppointment = async (prev, formData) => {
 };
 
 
-
 export const updateAppointmentById = async (payload) => {
   const supabase = await createClient();
 
@@ -332,9 +331,6 @@ export const updateAppointmentById = async (payload) => {
 };
 
 
-
-
-
 export const createOfflineAppointment = async (prev: any, formData: FormData) => {
   const supabase = await createClient();
 
@@ -368,5 +364,49 @@ export const createOfflineAppointment = async (prev: any, formData: FormData) =>
 
   return { success: true, data };
 };
+
+
+export const createReferral = async (formData: FormData) => {
+  const supabase = await createClient();
+
+  const patient_id = formData.get("patient_id")?.toString() ?? "";
+  const referral_id = formData.get("referral_id")?.toString() ?? "";
+  const by_doctorid = formData.get("by_doctorid");
+  const to_doctorid = formData.get("to_doctorid");
+  
+
+  const referralFields = {
+    patient_id,
+    referral_id,
+    by_doctorid,
+    to_doctorid,
+  };
+
+  // Insert row and select inserted data
+  const { data, error } = await supabase
+    .from("refferals")  // Ensure this is the correct table name
+    .insert(referralFields)
+    .select('*');  // Select all columns of inserted row(s)
+
+  if (error) {
+    console.error("Supabase insert error:", error);
+    return {
+      error: error.message,
+      referralFields,
+    };
+  }
+
+  if (!data || data.length === 0) {
+    return {
+      error: "No data returned after insert.",
+      referralFields,
+    };
+  }
+
+  // Return the first inserted row as single object for convenience
+  return { success: true, data };
+};
+
+
 
 

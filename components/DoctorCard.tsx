@@ -23,11 +23,6 @@ type DoctorCardProps = {
 export default function DoctorCard({ doctors, user, role, engagement, engagementList }: DoctorCardProps) {
     const handleAppointment = (id) => {
         router.push(`/doctors/${id}`);
-        // console.log(id)
-        // console.log("user : ", user)
-        // console.log("role : ", role)
-        // console.log("engagement :", engagement)
-        // console.log("engagement list", engagementList);
     }
     const router = useRouter();
     return (
@@ -91,13 +86,7 @@ export default function DoctorCard({ doctors, user, role, engagement, engagement
                                 Appointment Booked
                             </Button>
                         ) : role === 'doctor' ? (
-                            // <Button
-                            //     className="bg-primary text-white mt-0 hover:bg-red-500 hover:text-white"
-                            //     onClick={() => handleReferralDialog(doctor.id)}
-                            // >
-                            //     Refer to
-                            // </Button>
-                            <RefferalDialogue doctor={doctor}/>
+                            <RefferalDialogue doctor={doctor} byDoctor={user}/>
                         ) : (
                             <Button
                                 className="bg-primary text-white mt-0 hover:bg-red-500 hover:text-white"
