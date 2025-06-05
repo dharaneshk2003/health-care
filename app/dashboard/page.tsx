@@ -3,11 +3,14 @@ import FetchDataSteps from "@/components/tutorial/fetch-data-steps";
 import { createClient } from "@/utils/supabase/server";
 import { SupervisorPanel } from "@/components/supervisor-panel/supervisor-panel";
 import { redirect } from "next/navigation";
-import { getOfflineAppointments } from "../backend.ts";
+import { getOfflineAppointments,LoggedInUserRefferals } from "../backend.ts";
+
 
 export default async function Dashboard() {
   let offlineAppointments = await getOfflineAppointments();
+  let userRefferals = await LoggedInUserRefferals(); 
+  console.log(userRefferals)
   return (
-   <SupervisorPanel appointmentList={offlineAppointments} />
+   <SupervisorPanel appointmentList={offlineAppointments}/>
   );
 }

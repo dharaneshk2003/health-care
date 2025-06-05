@@ -1,4 +1,4 @@
-import { getAllData, patientDetails, LoggedInuserAppointments, LoggedInUserReferrals } from '../backend';
+import { getAllData, patientDetails, LoggedInUserAppointments, LoggedInUserRefferals } from '../backend';
 import DoctorClient from './DoctorClient';
 
 export default async function DoctorPage() {
@@ -15,11 +15,13 @@ export default async function DoctorPage() {
 
   if (role === 'doctor') {
     engagement = 'referral';
-    engagementList = []// await LoggedInUserReferrals() 👈 make sure this function exists in your backend
+    engagementList = await LoggedInUserRefferals() //👈 make sure this function exists in your backend
   } else if (role === 'patient') {
     engagement = 'appointment';
-    engagementList = await LoggedInuserAppointments();
+    engagementList = await LoggedInUserAppointments();
   }
+
+  console.log(`${engagement} - ${JSON.stringify(engagementList, null, 2)}`)
 
   return (
     <DoctorClient

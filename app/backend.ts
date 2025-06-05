@@ -129,7 +129,7 @@ export const getOfflineAppointments = async () => {
 
 
 
-export const LoggedInuserAppointments = async () => { 
+export const LoggedInUserAppointments = async () => { 
   const supabase = await createClient();
 
   // Get the logged-in user
@@ -155,6 +155,105 @@ export const LoggedInuserAppointments = async () => {
   }
 
   return data; // an array of appointments
+};
+
+export const getAppointmentsByReferral = async (patient_id: string) => {
+  const supabase = await createClient();
+
+  if (!patient_id) {
+    return {
+      error: "Missing patient_id",
+      data: null,
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("offline_appointments")
+    .select("*")
+    .eq("offline_id", patient_id);
+
+  if (error) {
+    console.error("Supabase query error:", error.message);
+    return {
+      error: error.message,
+      data: null,
+    };
+  }
+
+  return data;
+};
+
+
+
+// export const LoggedInUserRefferals = async () => { 
+//   const supabase = await createClient();
+
+//   // Get the logged-in user
+//   const {
+//     data: { user },
+//     error: userError,
+//   } = await supabase.auth.getUser();
+
+//   if (userError || !user) {
+//     return [];
+//   }
+
+//   // Fetch all appointments booked by the logged-in user
+//   const { data, error } = await supabase
+//     .from('refferals')
+//     .select('*')
+//     .eq('by_doctorid', user.id);  // or .eq('patient_id', user.id) if your table uses `patient_id`
+
+//   if (error) {
+//     console.error("Error fetching appointments for refferals:", error.message);
+//     return null;
+//   }
+
+//   let dataObject = { referal : data,}
+
+//   return dataObject; // an array of appointments
+// };
+
+export const LoggedInUserRefferals = async () => { 
+  const supabase = await createClient();
+
+  // Get the logged-in user
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return [];
+  }
+
+  // Fetch all referrals made by the logged-in doctor
+  const { data, error } = await supabase
+    .from('refferals')
+    .select('*')
+    .eq('by_doctorid', user.id);
+
+  if (error) {
+    console.error("Error fetching referrals:", error.message);
+    return null;
+  }
+
+  // Fetch doctor data for each to_doctorid
+  const doctors = await Promise.all(
+    data.map((referral) => getDataWithId(referral.to_doctorid))
+  );
+
+  // Fetch patient data for each patient_id (used as offline_id in offline_appointments)
+  const patients = await Promise.all(
+    data.map((referral) => getAppointmentsByReferral(referral.patient_id))
+  );
+
+  const dataObject = {
+    referal: data,
+    doctors,
+    patients,
+  };
+  return dataObject;
 };
 
 

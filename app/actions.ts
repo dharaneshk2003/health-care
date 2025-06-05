@@ -408,5 +408,32 @@ export const createReferral = async (formData: FormData) => {
 };
 
 
+export const getAppointmentsByReferral = async (patient_id: string) => {
+  const supabase = await createClient();
 
+  if (!patient_id) {
+    return {
+      error: "Missing patient_id",
+      data: null,
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("offline_appointments")
+    .select("*")
+    .eq("offline_id", patient_id);
+
+  if (error) {
+    console.error("Supabase query error:", error.message);
+    return {
+      error: error.message,
+      data: null,
+    };
+  }
+
+  return {
+    success: true,
+    data,
+  };
+};
 

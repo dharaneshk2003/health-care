@@ -26,8 +26,16 @@ interface Appointment {
   amount: number;
 }
 
+// export interface Referral {
+//   referral_id: string;
+//   patient_id: string;
+//   by_doctorid: string;
+//   to_doctorid: number;
+// }
+
 interface SupervisorPanelProps {
   appointmentList: Appointment[];
+  //  referralList: Referral[]  
 }
 
 export function SupervisorPanel({ appointmentList }: SupervisorPanelProps) {

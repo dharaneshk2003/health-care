@@ -76,7 +76,6 @@ export default function DoctorCard({ doctors, user, role, engagement, engagement
                         <p className="mx-0 font-bold text-lg mt-1">Consultation Fee : ₹{doctor.consultation_fees}</p>
                     </CardContent>
                     <CardFooter className="pt-2">
-                        {/* <Button className="bg-primary text-white mt-0 hover:bg-red-500 hover:text-white" onClick={()=>handleSubmit(doctor.id)}>{role=="doctor" ? "Give Referral" : "Book Appointment"}</Button> */}
                         {engagement === 'appointment' &&
                             engagementList.some((item) => item.doctor_id === doctor.id) ? (
                             <Button
@@ -85,8 +84,16 @@ export default function DoctorCard({ doctors, user, role, engagement, engagement
                             >
                                 Appointment Booked
                             </Button>
+                        ) : role === 'doctor' &&
+                            engagementList.some((item) => item.to_doctorid === doctor.id) ? (
+                            <Button
+                                className="bg-green-500 text-white mt-0 cursor-not-allowed"
+                                disabled
+                            >
+                                Already Referred
+                            </Button>
                         ) : role === 'doctor' ? (
-                            <RefferalDialogue doctor={doctor} byDoctor={user}/>
+                            <RefferalDialogue doctor={doctor} byDoctor={user} />
                         ) : (
                             <Button
                                 className="bg-primary text-white mt-0 hover:bg-red-500 hover:text-white"
@@ -95,7 +102,6 @@ export default function DoctorCard({ doctors, user, role, engagement, engagement
                                 Book Appointment
                             </Button>
                         )}
-
                     </CardFooter>
                 </Card>
             ))}
