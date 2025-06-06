@@ -9,8 +9,10 @@ import { getOfflineAppointments,LoggedInUserRefferals } from "../backend.ts";
 export default async function Dashboard() {
   let offlineAppointments = await getOfflineAppointments();
   let userRefferals = await LoggedInUserRefferals(); 
-  console.log(userRefferals)
   return (
-   <SupervisorPanel appointmentList={offlineAppointments}/>
+   <SupervisorPanel
+    appointmentList={offlineAppointments}
+    referralObject={userRefferals} // ✅ plain JSON object
+  />
   );
 }

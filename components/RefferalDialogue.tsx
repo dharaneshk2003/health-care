@@ -92,7 +92,6 @@ export default function ReferralDialogue({ doctor, byDoctor }) {
         description: `Patient ${patient_id} referred to ${doctor?.doctor_name} with referral ID ${referral_id}.`,
       });
       console.log("Referral created at database :", result);
-
       // Reset form with default doctor ids
       setFormData({
         patient_id: "",
@@ -101,6 +100,7 @@ export default function ReferralDialogue({ doctor, byDoctor }) {
         to_doctorid: doctor?.id,
       });
     }
+     window.location.reload();
   } catch (err) {
     toast({
       title: "Referral Failed",

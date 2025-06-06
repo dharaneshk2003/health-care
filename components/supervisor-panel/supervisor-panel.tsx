@@ -26,21 +26,21 @@ interface Appointment {
   amount: number;
 }
 
-// export interface Referral {
-//   referral_id: string;
-//   patient_id: string;
-//   by_doctorid: string;
-//   to_doctorid: number;
-// }
-
-interface SupervisorPanelProps {
-  appointmentList: Appointment[];
-  //  referralList: Referral[]  
+interface ReferralEntry {
+  refferal: any[];
+  doctors: { doctor_name: string; department: string }[];
+  patients: { name: string; age: number; gender: string; offline_id: string; phone: string }[];
 }
 
-export function SupervisorPanel({ appointmentList }: SupervisorPanelProps) {
-  const [currentView, setCurrentView] = useState<SupervisorView>("onlinePatients")
+export interface SupervisorPanelProps {
+  appointmentList: Appointment[];
+  referralObject: ReferralEntry | null; // <- update to match the new shape
+}
 
+
+export function SupervisorPanel({ appointmentList,referralObject }: SupervisorPanelProps) {
+  const [currentView, setCurrentView] = useState<SupervisorView>("onlinePatients")
+  console.log("from panel :",referralObject);
   const navigateTo = (view: SupervisorView) => {
     setCurrentView(view)
   }
@@ -52,7 +52,7 @@ export function SupervisorPanel({ appointmentList }: SupervisorPanelProps) {
 
         <main className="flex-1 py-0 pl-2">
           {currentView === "onlinePatients" && <SupervisorOnlinePatients list= {appointmentList} />}
-          {currentView === "staffManagement" && <SupervisorStaffManagement />}
+          {currentView === "staffManagement" && <SupervisorStaffManagement referralObject={referralObject}/>}
           {currentView === "analytics" && <SupervisorAnalytics />}
         </main>
       </div>

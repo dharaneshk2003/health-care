@@ -25,13 +25,14 @@ import {
 import { Button } from "@/components/ui/button"
 
 
-export default function RefferdDoctorslist({ offlinePatients }) {
+export default function RefferdDoctorslist({ offlinePatients,referralObject }) {
+    console.log("from diper:",referralObject);
     return (
         <div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {offlinePatients.map((patient) => (
                     <Card key={patient.id} className="overflow-hidden">
-                        <div className={`h-2 ${patient.status === "admitted" ? "bg-blue-500" : "bg-green-500"}`}></div>
+                        <div className={`h-2 ${patient.gender == "Female" ? "bg-blue-500" : "bg-yellow-500"}`}></div>
                         <CardHeader className="pb-2">
                             <div className="flex justify-between items-start">
                                 <div>
@@ -40,16 +41,6 @@ export default function RefferdDoctorslist({ offlinePatients }) {
                                         {patient.age} years, {patient.gender}
                                     </p>
                                 </div>
-                                <Badge
-                                    variant={patient.status === "admitted" ? "default" : "outline"}
-                                    className={
-                                        patient.status === "admitted"
-                                            ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
-                                            : "bg-green-100 text-green-800 hover:bg-green-100"
-                                    }
-                                >
-                                    {patient.status === "admitted" ? "Admitted" : "Discharged"}
-                                </Badge>
                             </div>
                         </CardHeader>
                         <CardContent className="pb-2">
@@ -102,7 +93,7 @@ export default function RefferdDoctorslist({ offlinePatients }) {
                 ))}
             </div>
 
-            {offlinePatients.length === 0 && (
+            {(!offlinePatients || offlinePatients.length === 0) && (
                 <div className="text-center py-10">
                     <p className="text-muted-foreground">No patients found matching your search.</p>
                 </div>

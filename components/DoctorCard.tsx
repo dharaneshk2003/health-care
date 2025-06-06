@@ -76,20 +76,14 @@ export default function DoctorCard({ doctors, user, role, engagement, engagement
                         <p className="mx-0 font-bold text-lg mt-1">Consultation Fee : ₹{doctor.consultation_fees}</p>
                     </CardContent>
                     <CardFooter className="pt-2">
-                        {engagement === 'appointment' &&
+                        {engagement === 'appointment' && Array.isArray(engagementList) &&
                             engagementList.some((item) => item.doctor_id === doctor.id) ? (
-                            <Button
-                                className="bg-green-500 text-white mt-0 cursor-not-allowed"
-                                disabled
-                            >
+                            <Button className="bg-green-500 text-white mt-0 cursor-not-allowed" disabled>
                                 Appointment Booked
                             </Button>
-                        ) : role === 'doctor' &&
-                            engagementList.some((item) => item.to_doctorid === doctor.id) ? (
-                            <Button
-                                className="bg-green-500 text-white mt-0 cursor-not-allowed"
-                                disabled
-                            >
+                        ) : role === 'doctor' && Array.isArray(engagementList?.refferal) &&
+                            engagementList.refferal.some((item) => item.to_doctorid === doctor.id) ? (
+                            <Button className="bg-green-500 text-white mt-0 cursor-not-allowed" disabled>
                                 Already Referred
                             </Button>
                         ) : role === 'doctor' ? (

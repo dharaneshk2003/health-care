@@ -214,7 +214,50 @@ export const getAppointmentsByReferral = async (patient_id: string) => {
 //   return dataObject; // an array of appointments
 // };
 
-export const LoggedInUserRefferals = async () => { 
+// export const LoggedInUserRefferals = async () => { 
+//   const supabase = await createClient();
+
+//   // Get the logged-in user
+//   const {
+//     data: { user },
+//     error: userError,
+//   } = await supabase.auth.getUser();
+
+//   if (userError || !user) {
+//     return [];
+//   }
+
+//   // Fetch all referrals made by the logged-in doctor
+//   const { data, error } = await supabase
+//     .from('refferals')
+//     .select('*')
+//     .eq('by_doctorid', user.id);
+
+//   if (error) {
+//     console.error("Error fetching referrals:", error.message);
+//     return null;
+//   }
+
+//   // Fetch doctor data for each to_doctorid
+//   const doctors = await Promise.all(
+//     data.map((referral) => getDataWithId(referral.to_doctorid))
+//   );
+
+//   // Fetch patient data for each patient_id (used as offline_id in offline_appointments)
+//   const patients = await Promise.all(
+//     data.map((referral) => getAppointmentsByReferral(referral.patient_id))
+//   );
+
+//   const dataObject = {
+//     referal: data,
+//     doctors,
+//     patients,
+//   };
+//   return dataObject;
+// };
+
+
+export const LoggedInUserRefferals = async () => {
   const supabase = await createClient();
 
   // Get the logged-in user
@@ -243,18 +286,41 @@ export const LoggedInUserRefferals = async () => {
     data.map((referral) => getDataWithId(referral.to_doctorid))
   );
 
-  // Fetch patient data for each patient_id (used as offline_id in offline_appointments)
+  // Extract only required fields from doctor data
+  const formattedDoctors = doctors.map((doc) => ({
+    doctor_name: doc?.doctor_name,
+    department: doc?.department,
+  }));
+
+  // Fetch patient data for each patient_id (used as offline_id)
   const patients = await Promise.all(
     data.map((referral) => getAppointmentsByReferral(referral.patient_id))
   );
 
-  const dataObject = {
-    referal: data,
-    doctors,
-    patients,
+  const formattedPatients = patients.map((patArr) => {
+  const pat = Array.isArray(patArr) ? patArr[0] : undefined;
+
+  return {
+    name: pat?.name,
+    age: pat?.age,
+    gender: pat?.gender,
+    offline_id: pat?.offline_id,
+    phone: pat?.phone,
   };
+});
+
+
+  // Extract only required fields from patient data
+  const dataObject = {
+    refferal: data,
+    doctors: formattedDoctors,
+    patients : formattedPatients,
+  };
+
   return dataObject;
 };
+
+
 
 
 
