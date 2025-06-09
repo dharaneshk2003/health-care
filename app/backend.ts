@@ -24,8 +24,6 @@ export const getFilteredDoctors = async (searchQuery) => {
     // Only include doctors who match all non-empty filters
     return nameMatches && dayMatches && fromTimeMatches && toTimeMatches && departmentMatches;
   });
-
-  console.log("Filtered doctors:", filteredDoctors);
   return filteredDoctors;
 };
 

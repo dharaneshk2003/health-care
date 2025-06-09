@@ -203,9 +203,6 @@ export default function PaymentInterface({ doctor, patient, appointment }) {
       });
       return;
     }
-
-    console.log("Submitting form data:", payload);
-
     const result = await updateAppointmentById(payload);
 
     if (!result || result.error) {

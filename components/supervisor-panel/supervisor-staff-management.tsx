@@ -36,7 +36,6 @@ const formattedPatients = refferal.map((ref, index) => {
   };
 });
 
-console.log("converted :",formattedPatients);
 
 
   const offlinePatients = [

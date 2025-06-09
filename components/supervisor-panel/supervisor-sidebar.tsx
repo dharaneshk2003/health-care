@@ -26,12 +26,12 @@ export function SupervisorSidebar({ currentView, onNavigate }: SupervisorSidebar
           </Button>
 
           <Button
-            variant={currentView === "staffManagement" ? "default" : "ghost"}
-            className={`w-full justify-start ${currentView === "staffManagement" ? "bg-primary hover:bg-primary" : ""}`}
-            onClick={() => onNavigate("staffManagement")}
+            variant={currentView === "refferalManagement" ? "default" : "ghost"}
+            className={`w-full justify-start ${currentView === "refferalManagement" ? "bg-primary hover:bg-primary" : ""}`}
+            onClick={() => onNavigate("refferalManagement")}
           >
             <Users className="h-4 w-4 mr-2" />
-            Staff Management
+            Refferal Management
           </Button>
 
           <Button

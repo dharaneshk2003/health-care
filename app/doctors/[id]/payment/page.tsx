@@ -10,7 +10,6 @@ export default async function ConformationPage({ params }: { params: { id: strin
   const doctor = await getDataWithId(id);
 
   let appointment = await getAppointment(id);
-  console.log(appointment);
   if (!doctor) {
     return <div>Doctor not found</div>
   }

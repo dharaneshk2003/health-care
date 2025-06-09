@@ -61,7 +61,6 @@ export default function ReferralDialogue({ doctor, byDoctor }) {
     return;
   }
 
-  console.log("foem data at frontEnd :",formData);
 
   setIsSubmitting(true);
 
@@ -73,11 +72,9 @@ export default function ReferralDialogue({ doctor, byDoctor }) {
     formDataObj.append("by_doctorid", formData.by_doctorid ?? "");
     formDataObj.append("to_doctorid", formData.to_doctorid ?? "");
 
-    console.log("before sending :", formDataObj);
 
     const result = await createReferral(formDataObj);
 
-    console.log("after sending :", result);
 
     if (result.error) {
       toast({
@@ -91,7 +88,6 @@ export default function ReferralDialogue({ doctor, byDoctor }) {
         title: "Referral Successful",
         description: `Patient ${patient_id} referred to ${doctor?.doctor_name} with referral ID ${referral_id}.`,
       });
-      console.log("Referral created at database :", result);
       // Reset form with default doctor ids
       setFormData({
         patient_id: "",

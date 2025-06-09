@@ -8,7 +8,7 @@ import { SupervisorAnalytics } from "./supervisor-analytics"
 import { SupervisorHeader } from "./supervisor-header"
 
 
-type SupervisorView = "onlinePatients" | "staffManagement" | "analytics"
+type SupervisorView = "onlinePatients" | "refferalManagement" | "analytics"
 
 interface Appointment {
   id: number;
@@ -40,7 +40,6 @@ export interface SupervisorPanelProps {
 
 export function SupervisorPanel({ appointmentList,referralObject }: SupervisorPanelProps) {
   const [currentView, setCurrentView] = useState<SupervisorView>("onlinePatients")
-  console.log("from panel :",referralObject);
   const navigateTo = (view: SupervisorView) => {
     setCurrentView(view)
   }
@@ -52,7 +51,7 @@ export function SupervisorPanel({ appointmentList,referralObject }: SupervisorPa
 
         <main className="flex-1 py-0 pl-2">
           {currentView === "onlinePatients" && <SupervisorOnlinePatients list= {appointmentList} />}
-          {currentView === "staffManagement" && <SupervisorStaffManagement referralObject={referralObject}/>}
+          {currentView === "refferalManagement" && <SupervisorStaffManagement referralObject={referralObject}/>}
           {currentView === "analytics" && <SupervisorAnalytics />}
         </main>
       </div>

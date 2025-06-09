@@ -49,7 +49,7 @@ export function UserCategoryFilters({ onFilterChange }: UserCategoryFiltersProps
 
   const applyAdvancedFilters = () => {
     // In a real app, this would apply the filters
-    console.log("Applied advanced filters:", advancedFilters)
+    return advancedFilters;
   }
 
   return (

@@ -29,7 +29,7 @@ export default function DoctorClient({ doctorList, role, user,engagement,engagem
       department: departmentValue !== 'All' ? departmentValue : null,
     };
 
-    console.log("Final FormData sent to backend:", formData);
+  
 
     const res = await fetch('/api/filterDoctors', {
       method: 'POST',

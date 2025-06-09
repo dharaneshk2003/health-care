@@ -243,7 +243,7 @@ export const createAppointment = async (prev, formData) => {
     .select()
     .single();
 
-  console.log("Inserted:", inserted, "Error:", error);
+ 
 
   if (error) {
     return {

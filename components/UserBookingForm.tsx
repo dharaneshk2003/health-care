@@ -143,8 +143,6 @@ export default function UserBookingForm({ doctor, patient }) {
       consultation_fees: calculateTotal(),
       total_fees: getTotalFee(calculateTotal()),
     };
-
-    console.log("payload : ", payload)
     const form = new FormData();
     Object.entries(payload).forEach(([key, value]) => {
       form.append(key, value);

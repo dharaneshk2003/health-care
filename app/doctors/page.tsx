@@ -21,8 +21,6 @@ export default async function DoctorPage() {
     engagementList = await LoggedInUserAppointments();
   }
 
-  console.log(`${engagement} - ${JSON.stringify(engagementList, null, 2)}`)
-
   return (
     <DoctorClient
       doctorList={doctorList}
