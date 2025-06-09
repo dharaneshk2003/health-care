@@ -1,9 +1,11 @@
 import React from 'react'
 import DoctorProfile from '../../components/Profile/Doctor/DoctorProfile.tsx'
-export default function Profile() {
+import { userDetails } from '../backend.ts'
+export default async function Profile() {
+  let info = await userDetails();
   return (
     <div>
-      <DoctorProfile/>
+      <DoctorProfile doctor={info}/>
     </div>
   )
 }

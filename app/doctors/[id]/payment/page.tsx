@@ -1,6 +1,6 @@
 import React from 'react'
 import PaymentInterface from '../../../../components/PaymentInterface.tsx';
-import { getDataWithId, patientDetails as getPatientDetails, getAppointment } from "../../../backend.ts";
+import { getDataWithId, userDetails as getPatientDetails, getAppointment } from "../../../backend.ts";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function ConformationPage({ params }: { params: { id: string } }) {

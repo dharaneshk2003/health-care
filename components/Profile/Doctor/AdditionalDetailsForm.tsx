@@ -56,7 +56,8 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
   'Wednesday',
   'Thursday',
   'Friday',
-  'Saturday'];
+  'Saturday',
+  'Everyday'];
 
 
   const indianLanguages = [
@@ -143,7 +144,7 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
                   onCheckedChange={(checked) =>
                   handleDayChange(day, checked as boolean)
                   }
-                  className="data-[state=checked]:bg-[#bd1818] data-[state=checked]:border-[#bd1818]" />
+                  className="data-[state=checked]:bg-[#bd1818] data-[state=checked]:border-[#bd1818] data-[state=checked]:text-white"/>
 
                   <Label htmlFor={day} className="text-sm font-medium">
                     {day}

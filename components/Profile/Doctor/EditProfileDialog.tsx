@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useRef } from 'react';
 import {
   Dialog,
@@ -12,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload, X } from 'lucide-react';
+
 
 interface DoctorData {
   image: string;
@@ -49,7 +51,7 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
     education: doctorData.education,
     department: doctorData.department,
     experience: doctorData.experience,
-    address: doctorData.address,
+    address: null,
     mapLocation: doctorData.mapLocation
   });
 
@@ -90,6 +92,7 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
       }
 
       setSelectedFile(file);
+      
 
       // Create preview URL
       const reader = new FileReader();
@@ -119,6 +122,10 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
 
     onUpdate(updatedData);
   };
+
+
+
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -235,7 +242,7 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="mapLocation">Map Location</Label>
+              <Label htmlFor="mapLocation">Location</Label>
               <Input
                 id="mapLocation"
                 value={formData.mapLocation}

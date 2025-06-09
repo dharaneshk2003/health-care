@@ -1,9 +1,9 @@
-import { getAllData, patientDetails, LoggedInUserAppointments, LoggedInUserRefferals } from '../backend';
+import { getAllData, userDetails, LoggedInUserAppointments, LoggedInUserRefferals } from '../backend';
 import DoctorClient from './DoctorClient';
 
 export default async function DoctorPage() {
   const doctorList = await getAllData();
-  const user = await patientDetails();
+  const user = await userDetails();
   const metadata = user?.user_metadata;
   
   // Determine role

@@ -53,23 +53,18 @@ export const getDataWithId = async (id) => {
   return doctor;
 }
 
-export const patientDetails = async () => {
+export const userDetails = async () => {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let userDetails = user;
-  return userDetails;
+  let details = user;
+  return details;
 }
 
 export const getPatientId = async () => {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  let userDetails = user;
+  let user = await userDetails();
   return user.id;
 }
 
@@ -181,80 +176,6 @@ export const getAppointmentsByReferral = async (patient_id: string) => {
   return data;
 };
 
-
-
-// export const LoggedInUserRefferals = async () => { 
-//   const supabase = await createClient();
-
-//   // Get the logged-in user
-//   const {
-//     data: { user },
-//     error: userError,
-//   } = await supabase.auth.getUser();
-
-//   if (userError || !user) {
-//     return [];
-//   }
-
-//   // Fetch all appointments booked by the logged-in user
-//   const { data, error } = await supabase
-//     .from('refferals')
-//     .select('*')
-//     .eq('by_doctorid', user.id);  // or .eq('patient_id', user.id) if your table uses `patient_id`
-
-//   if (error) {
-//     console.error("Error fetching appointments for refferals:", error.message);
-//     return null;
-//   }
-
-//   let dataObject = { referal : data,}
-
-//   return dataObject; // an array of appointments
-// };
-
-// export const LoggedInUserRefferals = async () => { 
-//   const supabase = await createClient();
-
-//   // Get the logged-in user
-//   const {
-//     data: { user },
-//     error: userError,
-//   } = await supabase.auth.getUser();
-
-//   if (userError || !user) {
-//     return [];
-//   }
-
-//   // Fetch all referrals made by the logged-in doctor
-//   const { data, error } = await supabase
-//     .from('refferals')
-//     .select('*')
-//     .eq('by_doctorid', user.id);
-
-//   if (error) {
-//     console.error("Error fetching referrals:", error.message);
-//     return null;
-//   }
-
-//   // Fetch doctor data for each to_doctorid
-//   const doctors = await Promise.all(
-//     data.map((referral) => getDataWithId(referral.to_doctorid))
-//   );
-
-//   // Fetch patient data for each patient_id (used as offline_id in offline_appointments)
-//   const patients = await Promise.all(
-//     data.map((referral) => getAppointmentsByReferral(referral.patient_id))
-//   );
-
-//   const dataObject = {
-//     referal: data,
-//     doctors,
-//     patients,
-//   };
-//   return dataObject;
-// };
-
-
 export const LoggedInUserRefferals = async () => {
   const supabase = await createClient();
 
@@ -317,14 +238,5 @@ export const LoggedInUserRefferals = async () => {
 
   return dataObject;
 };
-
-
-
-
-
-
-
-
-
 
 
