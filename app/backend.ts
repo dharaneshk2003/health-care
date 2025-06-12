@@ -239,6 +239,35 @@ export const LoggedInUserRefferals = async () => {
 
 
 
+export const getLoggedInDoctorDetails = async () => {
+  const supabase = await createClient();
+
+  // Step 1: Get the current logged-in user
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { present: false, data: null };
+  }
+
+  const userId = user.id;
+
+  // Step 2: Query the doctors table by online_id
+  const { data: doctor, error: doctorError } = await supabase
+    .from("doctors")
+    .select("*")
+    .eq("online_id", userId)
+    .single();
+
+  if (doctorError || !doctor) {
+    return { present: false, data: null };
+  }
+
+  return { present: true, data: doctor };
+};
+
 
 
 

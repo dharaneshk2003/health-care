@@ -449,11 +449,11 @@ export const handleFileUpload = async (
 
   const filePath = `${doctor_name}_${online_id}.jpg`;
 
-  // ✅ Upload file to Supabase Storage
+  // ✅ Upload file to Supabase Storage with upsert
   const { data: uploadData, error: uploadError } = await supabase.storage
     .from("profiles")
     .upload(filePath, file, {
-      upsert: true, // overwrite if exists
+      upsert: true,
     });
 
   if (uploadError) {
@@ -461,7 +461,7 @@ export const handleFileUpload = async (
     return null;
   }
 
-  // ✅ Generate public URL
+  // ✅ Get Public URL with cache-busting query
   const { data: publicUrlData, error: publicUrlError } = supabase.storage
     .from("profiles")
     .getPublicUrl(filePath);
@@ -471,8 +471,12 @@ export const handleFileUpload = async (
     return null;
   }
 
-  return publicUrlData?.publicUrl ?? null;
+  // Add a cache-busting query param to avoid stale image URLs
+  const imageUrl = `${publicUrlData?.publicUrl}?t=${Date.now()}`;
+
+  return imageUrl;
 };
+
 
 
 export const addDoctor = async (doctorData: Record<string, any>) => {

@@ -195,6 +195,7 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
                     {previewUrl || formData.image_url ? 'Change Picture' : 'Upload Picture'}
                   </Button>
                   
+                  
                 <p className="text-xs text-gray-500 text-center">
                   Supported formats: JPG, PNG, GIF (max 5MB)
                 </p>

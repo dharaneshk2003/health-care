@@ -24,7 +24,7 @@ interface DoctorData {
   consultation_fees: number;
 }
 
-const DoctorProfile = ({ doctor }) => {
+const DoctorEditProfile = ({ doctor }) => {
   let data = doctor?.user_metadata;
   const [doctorData, setDoctorData] = useState<DoctorData>({
     online_id: doctor.id,
@@ -61,14 +61,14 @@ const DoctorProfile = ({ doctor }) => {
     return `https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(location)}`;
   };
 
-const handleUpdateBasicInfo = (updatedData: Partial<DoctorData>) => {
-  setDoctorData((prev) => ({
-    ...prev,
-    ...updatedData,
-    image_url: updatedData.image_url || prev.image_url, // ✅ ensure Supabase URL is used
-  }));
-  setIsEditDialogOpen(false);
-};
+  const handleUpdateBasicInfo = (updatedData: Partial<DoctorData>) => {
+    setDoctorData((prev) => ({
+      ...prev,
+      ...updatedData,
+      image_url: updatedData.image_url || prev.image_url, // ✅ ensure Supabase URL is used
+    }));
+    setIsEditDialogOpen(false);
+  };
 
 
   const handleUpdateAdditionalInfo = (updatedData: Partial<DoctorData>) => {
@@ -77,40 +77,44 @@ const handleUpdateBasicInfo = (updatedData: Partial<DoctorData>) => {
   };
 
 
-const buildDoctorPayload = async () => {
-  let output = {
-    online_id: doctorData.online_id,
-    doctor_name: doctorData.doctor_name,
-    education: doctorData.education,
-    department: doctorData.department,
-    experience: doctorData.experience,
-    address: doctorData.address,
-    location: doctorData.location,
-    available_days: doctorData.available_days,
-    available_from_time: doctorData.available_from_time,
-    available_to_time: doctorData.available_to_time,
-    languages: doctorData.languages,
-    consultation_fees: doctorData.consultation_fees,
-    ratings: doctorData.rating,
-    image_url: doctorData.image_url, // ✅ now a valid Supabase Storage URL
+  const buildDoctorPayload = async () => {
+    let output = {
+      online_id: doctorData.online_id,
+      doctor_name: doctorData.doctor_name,
+      education: doctorData.education,
+      department: doctorData.department,
+      experience: doctorData.experience,
+      address: doctorData.address,
+      location: doctorData.location,
+      available_days: doctorData.available_days,
+      available_from_time: doctorData.available_from_time,
+      available_to_time: doctorData.available_to_time,
+      languages: doctorData.languages,
+      consultation_fees: doctorData.consultation_fees,
+      ratings: doctorData.rating,
+      image_url: doctorData.image_url, // ✅ now a valid Supabase Storage URL
+    };
+
+    try {
+      const result = await addDoctor(output);
+      if (result.success) {
+        console.log("✅ Doctor inserted successfully:", result.data);
+        window.location.reload();
+      } else {
+        console.error("❌ Error inserting doctor:", result.error);
+      }
+    } catch (err) {
+      console.error("❌ Unexpected error while inserting doctor:", err);
+    }
   };
 
-  try {
-    const result = await addDoctor(output);
-    if (result.success) {
-      console.log("✅ Doctor inserted successfully:", result.data);
-    } else {
-      console.error("❌ Error inserting doctor:", result.error);
-    }
-  } catch (err) {
-    console.error("❌ Unexpected error while inserting doctor:", err);
-  }
-};
-
   return (
-    <div className="bg-gray-50 px-0 w-full">
+    <div className="bg-white px-0 w-full">
       <div className="">
         {/* Main Profile Card */}
+        <h1 className="text-3xl md:text-4xl font-bold text-center text-primary mb-6 mt-2">
+          Doctor Registration for Consultation
+        </h1>
         <Card className="mb-8 overflow-hidden shadow-lg">
           <div className="bg-gradient-to-r from-[#bd1818] to-[#d63447] p-6 text-white">
             <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6">
@@ -214,32 +218,6 @@ const buildDoctorPayload = async () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Map Section */}
-         {doctorData.location &&
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-[#bd1818]">
-              <MapPin className="w-6 h-6" />
-              Location
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-           
-              <div className="w-full h-96 rounded-lg overflow-hidden">
-                <iframe
-                  src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3501.563474871569!2d77.20902731508236!3d28.65383698242871!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfce26ec085ef%3A0x441e32f4fa5002fb!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1608000000000!5m2!1sen!2sin`}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Doctor Location" />
-              </div>       
-          </CardContent>
-        </Card>
-      }
         {/* Edit Dialogs */}
         <EditProfileDialog
           isOpen={isEditDialogOpen}
@@ -263,4 +241,4 @@ const buildDoctorPayload = async () => {
 
 };
 
-export default DoctorProfile;
+export default DoctorEditProfile;
