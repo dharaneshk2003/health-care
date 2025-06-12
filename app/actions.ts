@@ -510,3 +510,8 @@ export const addDoctor = async (doctorData: Record<string, any>) => {
   return { success: true, data: inserted };
 };
 
+
+
+
+
+

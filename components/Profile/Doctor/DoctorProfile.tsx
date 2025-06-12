@@ -107,11 +107,8 @@ const buildDoctorPayload = async () => {
   }
 };
 
-
-
-
   return (
-    <div className="bg-gray-50 py-8 px-0 w-full">
+    <div className="bg-gray-50 px-0 w-full">
       <div className="">
         {/* Main Profile Card */}
         <Card className="mb-8 overflow-hidden shadow-lg">
@@ -214,12 +211,12 @@ const buildDoctorPayload = async () => {
               >
                 Submit
               </Button>
-
             </div>
           </CardContent>
         </Card>
 
         {/* Map Section */}
+         {doctorData.location &&
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-[#bd1818]">
@@ -228,7 +225,7 @@ const buildDoctorPayload = async () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {doctorData.location &&
+           
               <div className="w-full h-96 rounded-lg overflow-hidden">
                 <iframe
                   src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3501.563474871569!2d77.20902731508236!3d28.65383698242871!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfce26ec085ef%3A0x441e32f4fa5002fb!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1608000000000!5m2!1sen!2sin`}
@@ -239,11 +236,10 @@ const buildDoctorPayload = async () => {
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   title="Doctor Location" />
-              </div>
-            }
+              </div>       
           </CardContent>
         </Card>
-
+      }
         {/* Edit Dialogs */}
         <EditProfileDialog
           isOpen={isEditDialogOpen}
