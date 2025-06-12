@@ -120,8 +120,6 @@ export const getOfflineAppointments = async () => {
 };
 
 
-
-
 export const LoggedInUserAppointments = async () => { 
   const supabase = await createClient();
 
@@ -238,5 +236,9 @@ export const LoggedInUserRefferals = async () => {
 
   return dataObject;
 };
+
+
+
+
 
 

@@ -437,3 +437,76 @@ export const getAppointmentsByReferral = async (patient_id: string) => {
   };
 };
 
+
+export const handleFileUpload = async (
+  file: File,
+  online_id: string,
+  doctor_name: string
+): Promise<string | null> => {
+  const supabase = await createClient();
+
+  if (!file) return null;
+
+  const filePath = `${doctor_name}_${online_id}.jpg`;
+
+  // ✅ Upload file to Supabase Storage
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from("profiles")
+    .upload(filePath, file, {
+      upsert: true, // overwrite if exists
+    });
+
+  if (uploadError) {
+    console.warn("Upload error:", uploadError.message);
+    return null;
+  }
+
+  // ✅ Generate public URL
+  const { data: publicUrlData, error: publicUrlError } = supabase.storage
+    .from("profiles")
+    .getPublicUrl(filePath);
+
+  if (publicUrlError) {
+    console.warn("URL generation error:", publicUrlError.message);
+    return null;
+  }
+
+  return publicUrlData?.publicUrl ?? null;
+};
+
+
+export const addDoctor = async (doctorData: Record<string, any>) => {
+  const supabase = await createClient();
+
+  // ✅ Build payload cleanly and safely
+  const payload = {
+    online_id: doctorData.online_id,
+    doctor_name: doctorData.doctor_name,
+    education: doctorData.education,
+    department: doctorData.department,
+    experience: doctorData.experience,
+    address: doctorData.address,
+    location: doctorData.location,
+    available_days: doctorData.available_days,
+    available_from_time: doctorData.available_from_time,
+    available_to_time: doctorData.available_to_time,
+    languages: doctorData.languages,
+    consultation_fees: Number(doctorData.consultation_fees || 0),
+    ratings: Number(doctorData.rating || 3),
+    image_url: doctorData.image_url, // ✅ Already uploaded to Supabase Storage
+  };
+
+  // ✅ Insert into 'doctors' table
+  const { data: inserted, error } = await supabase
+    .from("doctors")
+    .insert([payload])
+    .select()
+    .single();
+
+  if (error) {
+    return { error: error.message, formFields: payload };
+  }
+
+  return { success: true, data: inserted };
+};
+

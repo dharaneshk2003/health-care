@@ -5,27 +5,29 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter } from
-'@/components/ui/dialog';
+  DialogFooter
+} from
+  '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload, X } from 'lucide-react';
-
+import { handleFileUpload } from '../../../app/actions.ts';
 
 interface DoctorData {
-  image: string;
-  name: string;
+  online_id: any;
+  image_url: string;
+  doctor_name: string;
   education: string;
   rating: number;
   department: string;
   experience: string;
   address: string;
-  mapLocation: string;
-  daysAvailable: string[];
-  timeSlot: {from: string;to: string;};
+  location: string;
+  available_days: string[];
+  timeSlot: { available_from_time: string; available_to_time: string; };
   languages: string[];
   consultationFee: number;
 }
@@ -34,7 +36,7 @@ interface EditProfileDialogProps {
   isOpen: boolean;
   onClose: () => void;
   doctorData: DoctorData;
-  onUpdate: (data: Partial<DoctorData>) => void;
+  onUpdate: (data: Partial<DoctorData>, imageFile?: File | null) => void;
   onShowAdditionalForm: () => void;
 }
 
@@ -46,13 +48,14 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
   onShowAdditionalForm
 }) => {
   const [formData, setFormData] = useState({
-    image: doctorData.image,
-    name: doctorData.name,
+    online_id: doctorData.online_id,
+    image_url: doctorData.image_url,
+    doctor_name: doctorData.doctor_name,
     education: doctorData.education,
     department: doctorData.department,
     experience: doctorData.experience,
     address: null,
-    mapLocation: doctorData.mapLocation
+    location: doctorData.location
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -60,48 +63,58 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const departments = [
-  'Cardiology',
-  'Neurology',
-  'Orthopedics',
-  'Pediatrics',
-  'Dermatology',
-  'General Medicine',
-  'Surgery',
-  'Gynecology',
-  'Psychiatry',
-  'Radiology'];
+    'Cardiology',
+    'Neurology',
+    'Orthopedics',
+    'Pediatrics',
+    'Dermatology',
+    'General Medicine',
+    'Surgery',
+    'Gynecology',
+    'Psychiatry',
+    'Radiology'];
 
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
-        return;
+    if (!file) return;
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File size should be less than 5MB");
+      return;
+    }
+
+    setSelectedFile(file);
+
+    // Preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setPreviewUrl(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+    try {
+      const imageUrl = await handleFileUpload(file, formData.online_id, formData.doctor_name);
+      if (imageUrl) {
+        console.log("Uploaded image URL:", imageUrl);
+        setFormData((prev) => ({ ...prev, image_url: imageUrl }));
+      } else {
+        console.log("Image upload failed: No URL returned");
       }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('File size should be less than 5MB');
-        return;
-      }
-
-      setSelectedFile(file);
-      
-
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreviewUrl(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+    } catch (err) {
+      console.log("Image upload failed with error:", err);
     }
   };
+
 
   const handleRemoveImage = () => {
     setSelectedFile(null);
@@ -111,13 +124,13 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
     }
   };
 
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // If a new file is selected, use the preview URL as the image
     const updatedData = {
       ...formData,
-      image: previewUrl || formData.image
     };
 
     onUpdate(updatedData);
@@ -148,41 +161,40 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
                   onChange={handleFileSelect}
                   className="hidden" />
 
-                
-                {previewUrl || formData.image ?
-                <div className="relative w-32 h-32 mx-auto">
+
+                {previewUrl || formData.image_url ?
+                  <div className="relative w-32 h-32 mx-auto">
                     <img
-                    src={previewUrl || formData.image}
-                    alt="Profile preview"
-                    className="w-full h-full object-cover rounded-lg border-2 border-gray-200" />
+                      src={previewUrl || formData.image_url}
+                      alt="Profile preview"
+                      className="w-full h-full object-cover rounded-lg border-2 border-gray-200" />
 
                     <button
-                    type="button"
-                    onClick={handleRemoveImage}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors">
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors">
 
                       <X className="w-4 h-4" />
                     </button>
                   </div> :
 
-                <div className="w-32 h-32 mx-auto border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                  <div className="w-32 h-32 mx-auto border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
                     <div className="text-center">
                       <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                       <p className="text-sm text-gray-500">No image</p>
                     </div>
                   </div>
                 }
-                
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="border-[#bd1818] text-[#bd1818] hover:bg-[#bd1818] hover:text-white mx-auto">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="border-[#bd1818] text-[#bd1818] hover:bg-[#bd1818] hover:text-white w-full mx-auto">
 
-                  <Upload className="w-4 h-4 mr-2" />
-                  {previewUrl || formData.image ? 'Change Picture' : 'Upload Picture'}
-                </Button>
-                
+                    <Upload className="w-4 h-4 mr-1" />
+                    {previewUrl || formData.image_url ? 'Change Picture' : 'Upload Picture'}
+                  </Button>
+                  
                 <p className="text-xs text-gray-500 text-center">
                   Supported formats: JPG, PNG, GIF (max 5MB)
                 </p>
@@ -190,16 +202,16 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="doctor_name">Full Name</Label>
               <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
+                id="doctor_name"
+                value={formData.doctor_name}
+                onChange={(e) => handleInputChange('doctor_name', e.target.value)}
                 placeholder="Dr. John Smith"
                 required />
 
             </div>
-
+            <Input type="hidden" name="online_id" value={doctorData.online_id} />
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="education">Education</Label>
               <Input
@@ -222,7 +234,7 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
                 </SelectTrigger>
                 <SelectContent>
                   {departments.map((dept) =>
-                  <SelectItem key={dept} value={dept}>
+                    <SelectItem key={dept} value={dept}>
                       {dept}
                     </SelectItem>
                   )}
@@ -242,11 +254,11 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="mapLocation">Location</Label>
+              <Label htmlFor="location">Location</Label>
               <Input
-                id="mapLocation"
-                value={formData.mapLocation}
-                onChange={(e) => handleInputChange('mapLocation', e.target.value)}
+                id="location"
+                value={formData.location}
+                onChange={(e) => handleInputChange('location', e.target.value)}
                 placeholder="Delhi"
                 required />
 

@@ -96,8 +96,8 @@ export default async function AuthButton() {
               </Link>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem><Link href="/profile">Profile</Link></DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <><Link href="/profile">
+            <DropdownMenuItem>Profile</DropdownMenuItem></Link></>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={signOutAction}>
               <LogOut className="h-4 w-4 mr-2" />

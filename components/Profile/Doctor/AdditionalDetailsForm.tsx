@@ -16,17 +16,18 @@ import { X } from 'lucide-react';
 
 interface DoctorData {
   image: string;
-  name: string;
+  doctor_name: string;
   education: string;
   rating: number;
   department: string;
   experience: string;
   address: string;
-  mapLocation: string;
-  daysAvailable: string[];
-  timeSlot: {from: string;to: string;};
+  location: string;
+  available_days: string[];
+  available_from_time: string;
+  available_to_time: string;
   languages: string[];
-  consultationFee: number;
+  consultation_fees: number;
 }
 
 interface AdditionalDetailsFormProps {
@@ -43,40 +44,23 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
   onUpdate
 }) => {
   const [formData, setFormData] = useState({
-    daysAvailable: doctorData.daysAvailable,
-    timeSlot: doctorData.timeSlot,
+    available_days: doctorData.available_days,
+    available_from_time: doctorData.available_from_time,
+    available_to_time: doctorData.available_to_time,
     languages: doctorData.languages,
-    consultationFee: doctorData.consultationFee
+    consultation_fees: doctorData.consultation_fees
   });
 
   const daysOfWeek = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Everyday'];
-
+    'Sunday', 'Monday', 'Tuesday', 'Wednesday',
+    'Thursday', 'Friday', 'Saturday', 'Everyday'
+  ];
 
   const indianLanguages = [
-  'English',
-  'Hindi',
-  'Bengali',
-  'Telugu',
-  'Marathi',
-  'Tamil',
-  'Gujarati',
-  'Urdu',
-  'Kannada',
-  'Odia',
-  'Malayalam',
-  'Punjabi',
-  'Assamese',
-  'Maithili',
-  'Sanskrit'];
-
+    'English', 'Hindi', 'Bengali', 'Telugu', 'Marathi', 'Tamil',
+    'Gujarati', 'Urdu', 'Kannada', 'Odia', 'Malayalam', 'Punjabi',
+    'Assamese', 'Maithili', 'Sanskrit'
+  ];
 
   const timeOptions = Array.from({ length: 24 }, (_, i) => {
     const hour = i.toString().padStart(2, '0');
@@ -84,24 +68,24 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
   }).flat();
 
   const handleDayChange = (day: string, checked: boolean) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      daysAvailable: checked ?
-      [...prev.daysAvailable, day] :
-      prev.daysAvailable.filter((d) => d !== day)
+      available_days: checked
+        ? [...prev.available_days, day]
+        : prev.available_days.filter(d => d !== day)
     }));
   };
 
-  const handleTimeSlotChange = (type: 'from' | 'to', time: string) => {
-    setFormData((prev) => ({
+  const handleTimeChange = (type: 'available_from_time' | 'available_to_time', value: string) => {
+    setFormData(prev => ({
       ...prev,
-      timeSlot: { ...prev.timeSlot, [type]: time }
+      [type]: value
     }));
   };
 
   const handleLanguageAdd = (language: string) => {
     if (!formData.languages.includes(language)) {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         languages: [...prev.languages, language]
       }));
@@ -109,9 +93,9 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
   };
 
   const handleLanguageRemove = (language: string) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      languages: prev.languages.filter((l) => l !== language)
+      languages: prev.languages.filter(l => l !== language)
     }));
   };
 
@@ -140,7 +124,7 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
               <div key={day} className="flex items-center space-x-2">
                   <Checkbox
                   id={day}
-                  checked={formData.daysAvailable.includes(day)}
+                  checked={formData.available_days.includes(day)}
                   onCheckedChange={(checked) =>
                   handleDayChange(day, checked as boolean)
                   }
@@ -163,8 +147,8 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="timeFrom">From</Label>
                 <Select
-                  value={formData.timeSlot.from}
-                  onValueChange={(time) => handleTimeSlotChange('from', time)}>
+                  value={formData.available_from_time}
+                  onValueChange={(time) => handleTimeChange('available_from_time', time)}>
 
                   <SelectTrigger>
                     <SelectValue placeholder="Select start time" />
@@ -181,8 +165,8 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="timeTo">To</Label>
                 <Select
-                  value={formData.timeSlot.to}
-                  onValueChange={(time) => handleTimeSlotChange('to', time)}>
+                  value={formData.available_to_time}
+                  onValueChange={(time) => handleTimeChange('available_to_time', time)}>
 
                   <SelectTrigger>
                     <SelectValue placeholder="Select end time" />
@@ -249,11 +233,11 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
               </span>
               <Input
                 type="number"
-                value={formData.consultationFee}
+                value={formData.consultation_fees}
                 onChange={(e) =>
                 setFormData((prev) => ({
                   ...prev,
-                  consultationFee: parseInt(e.target.value) || 0
+                  consultation_fees: parseInt(e.target.value) || 0
                 }))
                 }
                 placeholder="500"

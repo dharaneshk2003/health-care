@@ -6,41 +6,46 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Star, GraduationCap, Briefcase, Calendar, Clock, Languages, DollarSign } from 'lucide-react';
 import EditProfileDialog from './EditProfileDialog';
 import AdditionalDetailsForm from './AdditionalDetailsForm';
+import { handleFileUpload, addDoctor } from '../../../app/actions.ts';
 
 interface DoctorData {
-  image: string;
-  name: string;
+  image_url: string;
+  doctor_name: string;
   education: string;
   rating: number;
   department: string;
   experience: string;
   address: string;
-  mapLocation: string;
-  daysAvailable: string[];
-  timeSlot: { from: string; to: string; };
+  location: string;
+  available_days: string[];
+  available_from_time: string;
+  available_to_time: string;
   languages: string[];
-  consultationFee: number;
+  consultation_fees: number;
 }
 
 const DoctorProfile = ({ doctor }) => {
   let data = doctor?.user_metadata;
   const [doctorData, setDoctorData] = useState<DoctorData>({
-    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop&crop=face',
-    name: data.name,
+    online_id: doctor.id,
+    image_url: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop&crop=face',
+    doctor_name: data.name,
     education: data.education,
     rating: 3,
     department: data.department,
     experience: data.experience,
     address: "Enter Hospital Address",
-    mapLocation: null,
-    daysAvailable: ['Everyday'],
-    timeSlot: { from: 'From', to: 'To' },
+    location: null,
+    available_days: ['Everyday'],
+    available_from_time: 'From', available_to_time: 'To',
     languages: ['English'],
-    consultationFee: 0
+    consultation_fees: 0
   });
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [showAdditionalForm, setShowAdditionalForm] = useState(false);
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) =>
@@ -56,15 +61,54 @@ const DoctorProfile = ({ doctor }) => {
     return `https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(location)}`;
   };
 
-  const handleUpdateBasicInfo = (updatedData: Partial<DoctorData>) => {
-    setDoctorData((prev) => ({ ...prev, ...updatedData }));
-    setIsEditDialogOpen(false);
-  };
+const handleUpdateBasicInfo = (updatedData: Partial<DoctorData>) => {
+  setDoctorData((prev) => ({
+    ...prev,
+    ...updatedData,
+    image_url: updatedData.image_url || prev.image_url, // ✅ ensure Supabase URL is used
+  }));
+  setIsEditDialogOpen(false);
+};
+
 
   const handleUpdateAdditionalInfo = (updatedData: Partial<DoctorData>) => {
     setDoctorData((prev) => ({ ...prev, ...updatedData }));
     setShowAdditionalForm(false);
   };
+
+
+const buildDoctorPayload = async () => {
+  let output = {
+    online_id: doctorData.online_id,
+    doctor_name: doctorData.doctor_name,
+    education: doctorData.education,
+    department: doctorData.department,
+    experience: doctorData.experience,
+    address: doctorData.address,
+    location: doctorData.location,
+    available_days: doctorData.available_days,
+    available_from_time: doctorData.available_from_time,
+    available_to_time: doctorData.available_to_time,
+    languages: doctorData.languages,
+    consultation_fees: doctorData.consultation_fees,
+    ratings: doctorData.rating,
+    image_url: doctorData.image_url, // ✅ now a valid Supabase Storage URL
+  };
+
+  try {
+    const result = await addDoctor(output);
+    if (result.success) {
+      console.log("✅ Doctor inserted successfully:", result.data);
+    } else {
+      console.error("❌ Error inserting doctor:", result.error);
+    }
+  } catch (err) {
+    console.error("❌ Unexpected error while inserting doctor:", err);
+  }
+};
+
+
+
 
   return (
     <div className="bg-gray-50 py-8 px-0 w-full">
@@ -75,14 +119,14 @@ const DoctorProfile = ({ doctor }) => {
             <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6">
               <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
                 <img
-                  src={doctorData.image}
-                  alt={doctorData.name}
+                  src={doctorData.image_url}
+                  alt={doctorData.doctor_name}
                   className="w-full h-full object-cover" />
 
               </div>
 
               <div className="flex-1 text-center lg:text-left">
-                <h1 className="text-3xl lg:text-4xl font-bold mb-2">{doctorData.name}</h1>
+                <h1 className="text-3xl lg:text-4xl font-bold mb-2">{doctorData.doctor_name}</h1>
                 <div className="flex items-center justify-center lg:justify-start gap-2 mb-3">
                   <GraduationCap className="w-5 h-5" />
                   <span className="text-lg">{doctorData.education}</span>
@@ -122,7 +166,7 @@ const DoctorProfile = ({ doctor }) => {
                 <DollarSign className="w-5 h-5 text-[#bd1818]" />
                 <div>
                   <p className="text-sm text-gray-600">Consultation Fee</p>
-                  <p className="font-semibold">₹{doctorData.consultationFee}</p>
+                  <p className="font-semibold">₹{doctorData.consultation_fees}</p>
                 </div>
               </div>
             </div>
@@ -133,7 +177,7 @@ const DoctorProfile = ({ doctor }) => {
                 <Calendar className="w-5 h-5 text-[#bd1818]" />
                 <div>
                   <p className="text-sm text-gray-600">Available Days</p>
-                  <p className="font-semibold">{doctorData.daysAvailable.join(', ')}</p>
+                  <p className="font-semibold">{doctorData.available_days.join(', ')}</p>
                 </div>
               </div>
 
@@ -141,7 +185,7 @@ const DoctorProfile = ({ doctor }) => {
                 <Clock className="w-5 h-5 text-[#bd1818]" />
                 <div>
                   <p className="text-sm text-gray-600">Time Slot</p>
-                  <p className="font-semibold">{doctorData.timeSlot.from} - {doctorData.timeSlot.to}</p>
+                  <p className="font-semibold">{doctorData.available_from_time} - {doctorData.available_to_time}</p>
                 </div>
               </div>
 
@@ -163,9 +207,14 @@ const DoctorProfile = ({ doctor }) => {
                 Edit & Register
               </Button>
               <Button
-              onClick={()=>console.log("doctor data after editing :",doctorData)}
-              className="bg-[#bd1818] hover:bg-[#a11616] text-white font-semibold py-3 text-md w-full"
-              >Submit</Button>
+                onClick={buildDoctorPayload}
+
+
+                className="bg-[#bd1818] hover:bg-[#a11616] text-white font-semibold py-3 text-md w-full"
+              >
+                Submit
+              </Button>
+
             </div>
           </CardContent>
         </Card>
@@ -179,7 +228,7 @@ const DoctorProfile = ({ doctor }) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {doctorData.mapLocation &&
+            {doctorData.location &&
               <div className="w-full h-96 rounded-lg overflow-hidden">
                 <iframe
                   src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3501.563474871569!2d77.20902731508236!3d28.65383698242871!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfce26ec085ef%3A0x441e32f4fa5002fb!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1608000000000!5m2!1sen!2sin`}
@@ -200,12 +249,12 @@ const DoctorProfile = ({ doctor }) => {
           isOpen={isEditDialogOpen}
           onClose={() => setIsEditDialogOpen(false)}
           doctorData={doctorData}
-          onUpdate={handleUpdateBasicInfo}
+          onUpdate={(data, imageFile) => handleUpdateBasicInfo(data, imageFile)} // ✅ pass file too
           onShowAdditionalForm={() => {
             setIsEditDialogOpen(false);
             setShowAdditionalForm(true);
-          }} />
-
+          }}
+        />
 
         <AdditionalDetailsForm
           isOpen={showAdditionalForm}
