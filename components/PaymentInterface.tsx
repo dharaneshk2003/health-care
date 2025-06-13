@@ -35,7 +35,8 @@ import Image from "next/image";
 import { updateAppointmentById } from "../app/actions.ts";
 import { useToast } from "../hooks/use-toast.ts"
 import { ToastAction } from "@/components/ui/toast"
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from 'next/navigation';
+import MapboxExample from "../pages/MapboxExample.tsx";
 
 
 export default function PaymentInterface({ doctor, patient, appointment }) {
@@ -221,18 +222,18 @@ export default function PaymentInterface({ doctor, patient, appointment }) {
     });
   };
 
-const handlePayment = () => {
-  toast({
-    title: "Successfully Booked",
-    description: "Appointment booked successfully!",
-    action: <ToastAction altText="Undo">Undo</ToastAction>,
-  });
+  const handlePayment = () => {
+    toast({
+      title: "Successfully Booked",
+      description: "Appointment booked successfully!",
+      action: <ToastAction altText="Undo">Undo</ToastAction>,
+    });
 
-  // Wait 1.5–2 seconds before navigating
-  setTimeout(() => {
-    router.push('/doctors');
-  }, 1500);
-};
+    // Wait 1.5–2 seconds before navigating
+    setTimeout(() => {
+      router.push('/doctors');
+    }, 1500);
+  };
 
 
 
@@ -404,20 +405,12 @@ const handlePayment = () => {
                 </div>
 
                 {/* Map */}
-                <div className="relative bg-green-100 rounded-lg h-64 mb-4 overflow-hidden">
-                  <div className="mb-4">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224345.89797128353!2d77.04417311948666!3d28.52755440858552!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd5b347eb62d%3A0x52c2b7494e204dce!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1748094810172!5m2!1sen!2sin"
-                      title="hospital-map"
-                      width="100%"
-                      height="200"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      className="rounded-lg"
-                    />
+                <div className="relative bg-green-100 rounded-lg h-[400px] w-full mb-4 overflow-hidden">
+                  <div className="absolute inset-0">
+                    <MapboxExample location={doctor.location}  height={"400px"} width={"790px"}/>
                   </div>
                 </div>
+
 
                 {/* Map Actions */}
                 <div className="flex justify-center items-end gap-10 mb-6">

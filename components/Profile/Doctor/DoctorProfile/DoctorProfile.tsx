@@ -17,7 +17,7 @@ import {
     Video,
     User
 } from 'lucide-react';
-
+import MapboxExample from '../../../../pages/MapboxExample.tsx';
 interface Doctor {
     id: number;
     doctor_name: string;
@@ -221,17 +221,8 @@ export default function DoctorProfile({ doctor }: DoctorProfileProps) {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="w-full h-96 rounded-lg overflow-hidden">
-                                    <iframe
-                                        src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3501.563474871569!2d77.20902731508236!3d28.65383698242871!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfce26ec085ef%3A0x441e32f4fa5002fb!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1608000000000!5m2!1sen!2sin`}
-                                        width="100%"
-                                        height="100%"
-                                        style={{ border: 0 }}
-                                        allowFullScreen
-                                        loading="lazy"
-                                        referrerPolicy="no-referrer-when-downgrade"
-                                        title="Doctor Location" />
-
+                                <div className="w-full h-[380px] rounded-lg overflow-hidden">
+                                    <MapboxExample location={doctor.location} height={"380px"} width={"890px"} />
                                 </div>
                             </CardContent>
                         </Card>

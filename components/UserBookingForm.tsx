@@ -1,5 +1,6 @@
 "use client"
 import { useState } from "react"
+import MapboxExample from "../pages/MapboxExample.tsx";
 import { formatISO } from 'date-fns';
 import { ArrowLeft, Calendar, Clock, User, Info, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -346,7 +347,7 @@ export default function UserBookingForm({ doctor, patient }) {
                   <img
                     src={dummyDoctor.image_url}
                     alt={dummyDoctor.name || "Doctor"}
-                    className="rounded-md object-contain w-[130px] h-[123px] border-2 border-primary"
+                    className="rounded-md object-contain w-[130px] h-[123px]"
                   />
                 </div>
               </div>
@@ -388,17 +389,7 @@ export default function UserBookingForm({ doctor, patient }) {
             <CardContent>
               {showMap && (
                 <div className="mb-4">
-                  <iframe
-                    title="hospital-map"
-                    src={dummyHospital.mapUrl}
-                    width="100%"
-                    height="200"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    className="rounded-lg"
-                  />
+                  <MapboxExample location={dummyHospital.mapUrl} height={"200px"} width={"390px"}/>
                 </div>
               )}
               <div className="flex items-start">
