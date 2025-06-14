@@ -4,8 +4,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter } from
-'@/components/ui/dialog';
+  DialogFooter
+} from
+  '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -68,12 +69,44 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
   }).flat();
 
   const handleDayChange = (day: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      available_days: checked
-        ? [...prev.available_days, day]
-        : prev.available_days.filter(d => d !== day)
-    }));
+    setFormData((prev) => {
+      let updatedDays = [...prev.available_days];
+
+      if (day === "Everyday") {
+        if (checked) {
+          // ✅ Only "Everyday" is selected
+          updatedDays = ["Everyday"];
+        } else {
+          // ✅ Unchecking "Everyday"
+          updatedDays = [];
+        }
+      } else {
+        if (prev.available_days.includes("Everyday")) {
+          // ✅ Remove "Everyday" if other days are being selected
+          updatedDays = [];
+        }
+
+        if (checked) {
+          updatedDays.push(day);
+        } else {
+          updatedDays = updatedDays.filter((d) => d !== day);
+        }
+      }
+
+      return { ...prev, available_days: updatedDays };
+    });
+  };
+
+  const getFilteredToTimeOptions = () => {
+    if (!formData.available_from_time) return timeOptions;
+
+    const fromIndex = timeOptions.indexOf(formData.available_from_time);
+
+    // Show times strictly after 'from' time with wrap-around
+    return [
+      ...timeOptions.slice(fromIndex + 1),
+      ...timeOptions.slice(0, fromIndex + 1), // wrap around from midnight
+    ];
   };
 
   const handleTimeChange = (type: 'available_from_time' | 'available_to_time', value: string) => {
@@ -120,22 +153,32 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
               Days Available in Every Week
             </Label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {daysOfWeek.map((day) =>
-              <div key={day} className="flex items-center space-x-2">
-                  <Checkbox
-                  id={day}
-                  checked={formData.available_days.includes(day)}
-                  onCheckedChange={(checked) =>
-                  handleDayChange(day, checked as boolean)
-                  }
-                  className="data-[state=checked]:bg-[#bd1818] data-[state=checked]:border-[#bd1818] data-[state=checked]:text-white"/>
+              {daysOfWeek.map((day) => {
+                const isEverydayChecked = formData.available_days.includes("Everyday");
+                const isDisabled = isEverydayChecked && day !== "Everyday";
 
-                  <Label htmlFor={day} className="text-sm font-medium">
-                    {day}
-                  </Label>
-                </div>
-              )}
+                return (
+                  <div key={day} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={day}
+                      checked={formData.available_days.includes(day)}
+                      disabled={isDisabled}
+                      onCheckedChange={(checked) =>
+                        handleDayChange(day, checked as boolean)
+                      }
+                      className="data-[state=checked]:bg-[#bd1818] data-[state=checked]:border-[#bd1818] data-[state=checked]:text-white"
+                    />
+                    <Label
+                      htmlFor={day}
+                      className={`text-sm font-medium ${isDisabled ? "text-gray-400" : ""}`}
+                    >
+                      {day}
+                    </Label>
+                  </div>
+                );
+              })}
             </div>
+
           </div>
 
           {/* Time Slot */}
@@ -155,7 +198,7 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
                   </SelectTrigger>
                   <SelectContent>
                     {timeOptions.map((time) =>
-                    <SelectItem key={time} value={time}>
+                      <SelectItem key={time} value={time}>
                         {time}
                       </SelectItem>
                     )}
@@ -166,17 +209,17 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
                 <Label htmlFor="timeTo">To</Label>
                 <Select
                   value={formData.available_to_time}
-                  onValueChange={(time) => handleTimeChange('available_to_time', time)}>
-
+                  onValueChange={(time) => handleTimeChange('available_to_time', time)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select end time" />
                   </SelectTrigger>
                   <SelectContent>
-                    {timeOptions.map((time) =>
-                    <SelectItem key={time} value={time}>
+                    {getFilteredToTimeOptions().map((time) => (
+                      <SelectItem key={time} value={time}>
                         {time}
                       </SelectItem>
-                    )}
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -195,26 +238,26 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
                 </SelectTrigger>
                 <SelectContent>
                   {indianLanguages.
-                  filter((lang) => !formData.languages.includes(lang)).
-                  map((language) =>
-                  <SelectItem key={language} value={language}>
+                    filter((lang) => !formData.languages.includes(lang)).
+                    map((language) =>
+                      <SelectItem key={language} value={language}>
                         {language}
                       </SelectItem>
-                  )}
+                    )}
                 </SelectContent>
               </Select>
-              
+
               <div className="flex flex-wrap gap-2">
                 {formData.languages.map((language) =>
-                <Badge
-                  key={language}
-                  variant="secondary"
-                  className="bg-[#bd1818] text-white hover:bg-[#a11616] flex items-center gap-1">
+                  <Badge
+                    key={language}
+                    variant="secondary"
+                    className="bg-[#bd1818] text-white hover:bg-[#a11616] flex items-center gap-1">
 
                     {language}
                     <X
-                    className="w-3 h-3 cursor-pointer"
-                    onClick={() => handleLanguageRemove(language)} />
+                      className="w-3 h-3 cursor-pointer"
+                      onClick={() => handleLanguageRemove(language)} />
 
                   </Badge>
                 )}
@@ -235,10 +278,10 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({
                 type="number"
                 value={formData.consultation_fees}
                 onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  consultation_fees: parseInt(e.target.value) || 0
-                }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    consultation_fees: parseInt(e.target.value) || 0
+                  }))
                 }
                 placeholder="500"
                 className="pl-8"

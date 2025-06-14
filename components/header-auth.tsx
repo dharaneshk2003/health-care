@@ -5,6 +5,7 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/server";
 import { Heart, Bell, Settings, LogOut } from "lucide-react"
+import { getLoggedInDoctorDetails } from '../app/backend.ts';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,14 +20,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 
 export default async function AuthButton() {
+  const isPresent = await getLoggedInDoctorDetails();
   const supabase = await createClient();
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   let role = user?.user_metadata?.role;
   let name = user?.user_metadata?.name;
+
+
 
   if (!hasEnvVars) {
     return (
@@ -71,17 +74,12 @@ export default async function AuthButton() {
           <Bell className="h-5 w-5" />
           <span className="sr-only">Notifications</span>
         </Button>
-
-        <Button variant="ghost" size="icon">
-          <Settings className="h-5 w-5" />
-          <span className="sr-only">Settings</span>
-        </Button>
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="../Images/account.png" alt="User" />
+                {isPresent.present ? <AvatarImage src={isPresent.data.image_url} alt="User"/> : <AvatarImage src="https://media.gettyimages.com/id/1777940832/vector/healthcare-concept-vector-illustration-stethoscope-doctors-illness-patients.jpg?s=612x612&w=0&k=20&c=xMq7jzLoyR9anba0KBLphv9i4uX3HK4zPkIwYkgG57Y=" alt="User" />}
+                
                 <AvatarFallback>D</AvatarFallback>
               </Avatar>
             </Button>
@@ -116,7 +114,7 @@ export default async function AuthButton() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="../Images/account.png" alt="User" />
+                <AvatarImage src="https://media.gettyimages.com/id/1777940832/vector/healthcare-concept-vector-illustration-stethoscope-doctors-illness-patients.jpg?s=612x612&w=0&k=20&c=xMq7jzLoyR9anba0KBLphv9i4uX3HK4zPkIwYkgG57Y=" alt="User" />
                 <AvatarFallback>P</AvatarFallback>
               </Avatar>
             </Button>
@@ -129,7 +127,8 @@ export default async function AuthButton() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <><Link href="/profile">
+            <DropdownMenuItem>Profile</DropdownMenuItem></Link></>
           </DropdownMenuContent>
         </DropdownMenu>
         <Button variant="ghost" onClick={signOutAction} className="flex mb-1">

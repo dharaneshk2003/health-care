@@ -61,6 +61,7 @@ export const signUpActionDoctor = async (formData: FormData) => {
   const department = formData.get("department")?.toString();
   const experience = formData.get("experience")?.toString(); // Renamed as experience in UI
   const education = formData.get("education")?.toString();
+  const gender = formData.get("gender")?.toString();
 
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
@@ -83,6 +84,7 @@ export const signUpActionDoctor = async (formData: FormData) => {
         department,
         experience,
         education,
+        gender
       },
       emailRedirectTo: `${origin}/auth/callback`,
     },

@@ -162,10 +162,10 @@ export default function UserBookingForm({ doctor, patient }) {
       router.push(`/doctors/${id}/payment`);
     } catch (error) {
       toast({
-          title: "Appointment creation Failed",
-          description: "Failed to create appointment. Please try again.",
-          action: <ToastAction altText="Undo">Undo</ToastAction>,
-        });
+        title: "Appointment creation Failed",
+        description: "Failed to create appointment. Please try again.",
+        action: <ToastAction altText="Undo">Undo</ToastAction>,
+      });
     }
   };
 
@@ -207,8 +207,15 @@ export default function UserBookingForm({ doctor, patient }) {
                       disabled={(date) => {
                         const today = new Date();
                         const isPast = date < today.setHours(0, 0, 0, 0);
+
+                        // ✅ If "Everyday" is selected, allow all future dates
+                        if (availableDays.includes("Everyday")) {
+                          return isPast;
+                        }
+
                         const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
                         const isUnavailableDay = !availableDays.includes(dayName);
+
                         return isPast || isUnavailableDay;
                       }}
                     />
@@ -389,7 +396,7 @@ export default function UserBookingForm({ doctor, patient }) {
             <CardContent>
               {showMap && (
                 <div className="mb-4">
-                  <MapboxExample location={dummyHospital.mapUrl} height={"200px"} width={"390px"}/>
+                  <MapboxExample location={dummyHospital.mapUrl} height={"200px"} width={"390px"} />
                 </div>
               )}
               <div className="flex items-start">

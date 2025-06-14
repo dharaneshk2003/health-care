@@ -65,6 +65,9 @@ export default function DoctorRegisterForm({ message }: { message: Message }) {
             <Input id="email" name="email" type="email" required className="mt-1" placeholder="email"/>
           </div>
 
+          
+
+
           <div className="flex gap-4 my-2">
             <div className="w-1/2">
               <Label htmlFor="department">Department</Label>
@@ -111,6 +114,20 @@ export default function DoctorRegisterForm({ message }: { message: Message }) {
               className="mt-1"
               placeholder="enter password"
             />
+
+            <div className="my-2">
+              <Label htmlFor="gender" className="">Gender</Label>
+              <Select name="gender" required>
+                <SelectTrigger id="gender" className="mt-1">
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <Button
               type="button"
               variant="ghost"
