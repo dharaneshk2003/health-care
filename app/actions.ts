@@ -278,7 +278,6 @@ export const createAppointment = async (prev, formData) => {
   return { success: true, data: inserted };
 };
 
-
 export const updateAppointmentById = async (payload) => {
   const supabase = await createClient();
 
@@ -332,7 +331,6 @@ export const updateAppointmentById = async (payload) => {
   }
 };
 
-
 export const createOfflineAppointment = async (prev: any, formData: FormData) => {
   const supabase = await createClient();
 
@@ -366,7 +364,6 @@ export const createOfflineAppointment = async (prev: any, formData: FormData) =>
 
   return { success: true, data };
 };
-
 
 export const createReferral = async (formData: FormData) => {
   const supabase = await createClient();
@@ -409,7 +406,6 @@ export const createReferral = async (formData: FormData) => {
   return { success: true, data };
 };
 
-
 export const getAppointmentsByReferral = async (patient_id: string) => {
   const supabase = await createClient();
 
@@ -438,7 +434,6 @@ export const getAppointmentsByReferral = async (patient_id: string) => {
     data,
   };
 };
-
 
 export const handleFileUpload = async (
   file: File,
@@ -478,8 +473,6 @@ export const handleFileUpload = async (
 
   return imageUrl;
 };
-
-
 
 export const addDoctor = async (doctorData: Record<string, any>) => {
   const supabase = await createClient();
