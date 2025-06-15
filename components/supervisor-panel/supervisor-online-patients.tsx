@@ -14,13 +14,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { createOfflineAppointment } from "../../app/actions.ts"
 import { useToast } from "../../hooks/use-toast.ts"
 import { ToastAction } from "@/components/ui/toast"
-import { useRouter } from 'next/navigation'; 
-export function SupervisorOnlinePatients({ list }) {
-
+import { useRouter } from 'next/navigation';
+import { getUniqueDepartments } from "../../app/backend.ts"
+export function SupervisorOnlinePatients({ list, departmentList }) {
+  const router = useRouter();
   const randomSixDigit = Math.floor(Math.random() * (999999 - 111111 + 1)) + 111111;
-  const [searchQuery, setSearchQuery] = useState("")
+
+  const [searchQuery, setSearchQuery] = useState("");
   const [patientsData, setPatientsData] = useState(list);
-  const [isAddPatientOpen, setIsAddPatientOpen] = useState(false)
+  const [isAddPatientOpen, setIsAddPatientOpen] = useState(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
   const [formData, setFormData] = useState({
     offline_id: `POF-${randomSixDigit}`,
     name: "",
@@ -33,17 +37,25 @@ export function SupervisorOnlinePatients({ list }) {
     date: "",
     time: "",
     notes: "",
-    amount: Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000
+    amount: Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000,
   });
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
-
+  const { toast } = useToast();
 
   const handleChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: field === "age" ? Number(value) : value,
-    }));
+    setFormData((prev) => {
+      if (field === "specialty") {
+        return {
+          ...prev,
+          specialty: value,
+          doctor: "", // Reset doctor on specialty change
+        };
+      }
+      return {
+        ...prev,
+        [field]: field === "age" ? Number(value) : value,
+      };
+    });
   };
 
   const timeFormatForFrontEnd = (time) => {
@@ -53,8 +65,7 @@ export function SupervisorOnlinePatients({ list }) {
     return `${formattedHour}:${minute.toString().padStart(2, "0")} ${period}`;
   };
 
-  const { toast } = useToast()
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.date || !formData.time) {
@@ -66,21 +77,7 @@ export function SupervisorOnlinePatients({ list }) {
       return;
     }
 
-    const payload = {
-      offline_id: formData.offline_id,
-      name: formData.name,
-      phone: formData.phone,
-      age: formData.age,
-      gender: formData.gender,
-      status: formData.status,
-      doctor: formData.doctor,
-      specialty: formData.specialty,
-      date: formData.date,
-      time: formData.time,
-      notes: formData.notes || "",
-      amount: formData.amount,
-    };
-
+    const payload = { ...formData, notes: formData.notes || "" };
     const form = new FormData();
     Object.entries(payload).forEach(([key, value]) => {
       form.append(key, String(value));
@@ -104,10 +101,8 @@ export function SupervisorOnlinePatients({ list }) {
       });
 
       setIsAddPatientOpen(false);
-
-      setTimeout(() => {
-         router.refresh();
-      }, 2000);
+      window.location.reload();
+      setTimeout(() => router.refresh(), 2000);
     } catch (error) {
       console.error(error);
       toast({
@@ -118,12 +113,16 @@ export function SupervisorOnlinePatients({ list }) {
     }
   };
 
+  const selectedDoctors =
+    departmentList.find((dept) => dept.department === formData.specialty)?.doctors || [];
+
   const filteredPatients = patientsData.filter(
     (patient) =>
       patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       patient.offline_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patient.doctor.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+      patient.doctor.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
 
   return (
     <div className="space-y-6">
@@ -215,36 +214,47 @@ export function SupervisorOnlinePatients({ list }) {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="doctor">Doctor</Label>
-                      <Select onValueChange={(value) => handleChange("doctor", value)}>
-                        <SelectTrigger id="doctor">
-                          <SelectValue placeholder="Select doctor" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="dr-rajesh">Dr. Rajesh Kumar</SelectItem>
-                          <SelectItem value="dr-priya">Dr. Priya Sharma</SelectItem>
-                          <SelectItem value="dr-vikram">Dr. Vikram Singh</SelectItem>
-                          <SelectItem value="dr-ananya">Dr. Ananya Patel</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    {/* Specialty */}
                     <div className="grid gap-2">
                       <Label htmlFor="specialty">Specialty</Label>
                       <Select
+                        value={formData.specialty}
                         onValueChange={(value) => handleChange("specialty", value)}
                       >
                         <SelectTrigger id="specialty">
                           <SelectValue placeholder="Select specialty" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Cardiology">Cardiology</SelectItem>
-                          <SelectItem value="Dermatology">Dermatology</SelectItem>
-                          <SelectItem value="Orthopedic">Orthopedic</SelectItem>
-                          <SelectItem value="Pediatrics">Pediatrics</SelectItem>
+                          {departmentList.map((dept) => (
+                            <SelectItem key={dept.department} value={dept.department}>
+                              {dept.department}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
+
+                    {/* Doctor */}
+                    <div className="grid gap-2">
+                      <Label htmlFor="doctor">Doctor</Label>
+                      <Select
+                        value={formData.doctor}
+                        onValueChange={(value) => handleChange("doctor", value)}
+                        disabled={selectedDoctors.length === 0}
+                      >
+                        <SelectTrigger id="doctor">
+                          <SelectValue placeholder={selectedDoctors.length ? "Select doctor" : "Select specialty first"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {selectedDoctors.map((doctor) => (
+                            <SelectItem key={doctor} value={doctor}>
+                              Dr. {doctor}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">

@@ -20,7 +20,6 @@ export default function DoctorClient({ doctorList, role, user,engagement,engagem
   const [searched, setSearched] = useState(false);
   const [departmentValue, setDepartmentValue] = useState("All");
 
-
   const handleFilterData = async (filters) => {
     setSearched(true);
 

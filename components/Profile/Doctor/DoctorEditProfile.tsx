@@ -3,10 +3,20 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Star, GraduationCap, Briefcase, Calendar, Clock, Languages, DollarSign } from 'lucide-react';
+import { MapPin, Star, GraduationCap, Briefcase, Calendar, Clock, Languages, DollarSign,SquareUser } from 'lucide-react';
 import EditProfileDialog from './EditProfileDialog';
 import AdditionalDetailsForm from './AdditionalDetailsForm';
 import { handleFileUpload, addDoctor } from '../../../app/actions.ts';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
 
 interface DoctorData {
   image_url: string;
@@ -24,22 +34,25 @@ interface DoctorData {
   consultation_fees: number;
 }
 
-const DoctorEditProfile = ({ doctor }) => {
+const DoctorEditProfile = ({ doctor, existingData }) => {
   let data = doctor?.user_metadata;
   const [doctorData, setDoctorData] = useState<DoctorData>({
     online_id: doctor.id,
-    image_url: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop&crop=face',
-    doctor_name: data.name,
-    education: data.education,
+    image_url: existingData?.image_url || 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop&crop=face',
+    doctor_name: existingData?.doctor_name || data.name,
+    education: existingData?.education || data.education,
     rating: 3,
-    department: data.department,
-    experience: data.experience,
-    address: "Enter Hospital Address",
-    location: null,
-    available_days: ['Everyday'],
-    available_from_time: 'From', available_to_time: 'To',
-    languages: ['English'],
-    consultation_fees: 0
+    role: doctor.user_metadata.role,
+    department: existingData?.department || data.department,
+    experience: existingData?.experience || data.experience,
+    address: existingData?.address || "Address",
+    location: existingData?.location || null,
+    available_days: existingData?.available_days || ['Everyday'],
+    available_from_time: existingData?.available_from_time || 'From', available_to_time: existingData?.available_to_time || 'To',
+    languages: existingData?.languages || ['English'],
+    consultation_fees: existingData?.consultation_fees || 0,
+    gender: existingData?.gender || data.gender,
+    mobile: existingData?.mobile || data.mobile
   });
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -57,9 +70,6 @@ const DoctorEditProfile = ({ doctor }) => {
     );
   };
 
-  const getMapUrl = (location: string) => {
-    return `https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(location)}`;
-  };
 
   const handleUpdateBasicInfo = (updatedData: Partial<DoctorData>) => {
     setDoctorData((prev) => ({
@@ -77,7 +87,8 @@ const DoctorEditProfile = ({ doctor }) => {
   };
 
 
-  const buildDoctorPayload = async () => {
+  const buildDoctorPayload = async (e) => {
+    e.preventDefault();
     let output = {
       online_id: doctorData.online_id,
       doctor_name: doctorData.doctor_name,
@@ -92,9 +103,11 @@ const DoctorEditProfile = ({ doctor }) => {
       languages: doctorData.languages,
       consultation_fees: doctorData.consultation_fees,
       ratings: doctorData.rating,
-      image_url: doctorData.image_url, // ✅ now a valid Supabase Storage URL
+      image_url: doctorData.image_url,
+      mobile: doctorData.mobile,
+      gender: doctorData.gender, // ✅ now a valid Supabase Storage URL
     };
-
+    console.log(doctorData?.role);
     try {
       const result = await addDoctor(output);
       if (result.success) {
@@ -113,7 +126,7 @@ const DoctorEditProfile = ({ doctor }) => {
       <div className="">
         {/* Main Profile Card */}
         <h1 className="text-3xl md:text-4xl font-bold text-center text-primary mb-6 mt-2">
-          Doctor Registration for Consultation
+          Doctor Profile
         </h1>
         <Card className="mb-8 overflow-hidden shadow-lg">
           <div className="bg-gradient-to-r from-[#bd1818] to-[#d63447] p-6 text-white">
@@ -146,7 +159,7 @@ const DoctorEditProfile = ({ doctor }) => {
           </div>
 
           <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <Briefcase className="w-5 h-5 text-[#bd1818]" />
                 <div>
@@ -164,58 +177,85 @@ const DoctorEditProfile = ({ doctor }) => {
               </div>
 
               <div className="flex items-center gap-3">
-                <DollarSign className="w-5 h-5 text-[#bd1818]" />
+                <SquareUser className="w-5 h-5 text-[#bd1818]" />
                 <div>
-                  <p className="text-sm text-gray-600">Consultation Fee</p>
-                  <p className="font-semibold">₹{doctorData.consultation_fees}</p>
+                  <p className="text-sm text-gray-600">Gender</p>
+                  <p className="font-semibold">{doctorData.gender=="male"? "Male":(doctorData.gender=="female" ? "Female" : "Others")}</p>
                 </div>
               </div>
-            </div>
 
-            {/* Additional Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                <div className="flex items-center gap-3">
+                  <DollarSign className="w-5 h-5 text-[#bd1818]" />
+                  <div>
+                    <p className="text-sm text-gray-600">Consultation Fee</p>
+                    <p className="font-semibold">₹{doctorData.consultation_fees}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div className="flex items-center gap-3">
+                  <Calendar className="w-5 h-5 text-[#bd1818]" />
+                  <div>
+                    <p className="text-sm text-gray-600">Available Days</p>
+                    <p className="font-semibold">{doctorData.available_days.join(', ')}</p>
+                  </div>
+                </div>
+
               <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-[#bd1818]" />
-                <div>
-                  <p className="text-sm text-gray-600">Available Days</p>
-                  <p className="font-semibold">{doctorData.available_days.join(', ')}</p>
+                  <Calendar className="w-5 h-5 text-[#bd1818]" />
+                  <div>
+                    <p className="text-sm text-gray-600">Mobile</p>
+                    <p className="font-semibold">+91 {doctorData.mobile}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Clock className="w-5 h-5 text-[#bd1818]" />
+                  <div>
+                    <p className="text-sm text-gray-600">Time Slot</p>
+                    <p className="font-semibold">{doctorData.available_from_time} - {doctorData.available_to_time}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Languages className="w-5 h-5 text-[#bd1818]" />
+                  <div>
+                    <p className="text-sm text-gray-600">Languages</p>
+                    <p className="font-semibold">{doctorData.languages.join(', ')}</p>
+                  </div>
                 </div>
               </div>
+              <Drawer>
+                <DrawerTrigger className="ml-[30%] bg-primary text-white py-2 px-3 rounded-md font-bold">Click to Edit and Apply</DrawerTrigger>
+                <DrawerContent>
+                  <DrawerHeader>
+                    <DrawerTitle><div className="text-2xl md:text-xl font-bold text-primary">
+                      Doctor Registration for Consultatiom
+                    </div></DrawerTitle>
+                    <DrawerDescription>Edit your details for interacting with Patients</DrawerDescription>
+                  </DrawerHeader>
+                  <DrawerFooter>
+                    <div className="flex justify-center space-x-6">
+                      <Button
+                        onClick={() => setIsEditDialogOpen(true)}
+                        variant="secondary"
+                      >
+                        Edit Details
+                      </Button>
+                      <DrawerClose>
+                        <Button
+                          onClick={buildDoctorPayload}
+                          className="bg-[#bd1818] hover:bg-[#a11616] text-white font-semibold py-3 text-md"
+                        >
+                          Add for Consultation
+                        </Button>
+                      </DrawerClose>
+                    </div>
+                  </DrawerFooter>
+                </DrawerContent>
+              </Drawer>
 
-              <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-[#bd1818]" />
-                <div>
-                  <p className="text-sm text-gray-600">Time Slot</p>
-                  <p className="font-semibold">{doctorData.available_from_time} - {doctorData.available_to_time}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Languages className="w-5 h-5 text-[#bd1818]" />
-                <div>
-                  <p className="text-sm text-gray-600">Languages</p>
-                  <p className="font-semibold">{doctorData.languages.join(', ')}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-left space-x-6">
-              <Button
-                onClick={() => setIsEditDialogOpen(true)}
-                variant="secondary"
-                className="w-full"
-              >
-                Edit & Register
-              </Button>
-              <Button
-                onClick={buildDoctorPayload}
-
-
-                className="bg-[#bd1818] hover:bg-[#a11616] text-white font-semibold py-3 text-md w-full"
-              >
-                Submit
-              </Button>
-            </div>
           </CardContent>
         </Card>
         {/* Edit Dialogs */}

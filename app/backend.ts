@@ -269,5 +269,65 @@ export const getLoggedInDoctorDetails = async () => {
 };
 
 
+export const getUniqueDepartments = async () => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("doctors")
+    .select("department, doctor_name")
+    .neq("department", null);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  // Group doctor names by department
+  const grouped: Record<string, string[]> = {};
+
+  data.forEach(({ department, doctor_name }) => {
+    if (!grouped[department]) {
+      grouped[department] = [];
+    }
+    grouped[department].push(doctor_name);
+  });
+
+  // Convert to an array if needed
+  const departmentsWithDoctors = Object.entries(grouped).map(([department, doctors]) => ({
+    department,
+    doctors,
+  }));
+
+  return { success: true, data: departmentsWithDoctors };
+};
+
+
+export const getLoggedInPatientDetails = async () => {
+  const supabase = await createClient();
+
+  // Step 1: Get the current logged-in user
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { present: false, data: null };
+  }
+
+  const userId = user.id;
+
+  // Step 2: Query the doctors table by online_id
+  const { data: patient, error: doctorError } = await supabase
+    .from("patients")
+    .select("*")
+    .eq("user_id", userId)
+    .single();
+
+  if (doctorError || !patient) {
+    return { present: false, data: null };
+  }
+
+  return { present: true, data: patient };
+};
 
 

@@ -28,6 +28,7 @@ export default function DoctorCard({ doctors, user, role, engagement, engagement
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {doctors?.map((doctor, index) => (
+                doctor?.online_id !== user?.id && ( 
                 <Card key={index} className="w-[400px] mr-3-0">
                     <CardHeader className="pl-3 pb-1 pt-3">
                         <div className="flex mt-2">
@@ -98,7 +99,7 @@ export default function DoctorCard({ doctors, user, role, engagement, engagement
                         )}
                     </CardFooter>
                 </Card>
-            ))}
+            )))}
         </div>
     );
 }

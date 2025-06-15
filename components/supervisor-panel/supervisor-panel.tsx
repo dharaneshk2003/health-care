@@ -38,7 +38,7 @@ export interface SupervisorPanelProps {
 }
 
 
-export function SupervisorPanel({ appointmentList,referralObject }: SupervisorPanelProps) {
+export function SupervisorPanel({ appointmentList,referralObject,departmentList }: SupervisorPanelProps) {
   const [currentView, setCurrentView] = useState<SupervisorView>("onlinePatients")
   const navigateTo = (view: SupervisorView) => {
     setCurrentView(view)
@@ -50,7 +50,7 @@ export function SupervisorPanel({ appointmentList,referralObject }: SupervisorPa
         <SupervisorSidebar currentView={currentView} onNavigate={navigateTo} />
 
         <main className="flex-1 py-0 pl-2">
-          {currentView === "onlinePatients" && <SupervisorOnlinePatients list= {appointmentList} />}
+          {currentView === "onlinePatients" && <SupervisorOnlinePatients list= {appointmentList} departmentList={departmentList}/>}
           {currentView === "refferalManagement" && <SupervisorStaffManagement referralObject={referralObject}/>}
           {currentView === "analytics" && <SupervisorAnalytics />}
         </main>

@@ -153,7 +153,7 @@ export default function ReferralDialogue({ doctor, byDoctor }) {
                                     type="button"
                                     variant="outline"
                                     onClick={generateReferralId}
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || formData.referral_id}
                                 >
                                     Generate
                                 </Button>

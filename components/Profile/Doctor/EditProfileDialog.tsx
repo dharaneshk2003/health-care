@@ -30,6 +30,8 @@ interface DoctorData {
   timeSlot: { available_from_time: string; available_to_time: string; };
   languages: string[];
   consultationFee: number;
+  gender: string;
+  mobile: string;
 }
 
 interface EditProfileDialogProps {
@@ -55,7 +57,10 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
     department: doctorData.department,
     experience: doctorData.experience,
     address: null,
-    location: doctorData.location
+    location: doctorData.location,
+    gender: doctorData.gender,
+    mobile: doctorData.mobile,
+    role : doctorData.role,
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -103,7 +108,7 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
     };
     reader.readAsDataURL(file);
     try {
-      const imageUrl = await handleFileUpload(file, formData.online_id, formData.doctor_name);
+      const imageUrl = await handleFileUpload(file, formData.online_id, formData.doctor_name,formData.role);
       if (imageUrl) {
         console.log("Uploaded image URL:", imageUrl);
         setFormData((prev) => ({ ...prev, image_url: imageUrl }));
@@ -185,33 +190,60 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
                     </div>
                   </div>
                 }
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="border-[#bd1818] text-[#bd1818] hover:bg-[#bd1818] hover:text-white w-full mx-auto">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-[#bd1818] text-[#bd1818] hover:bg-[#bd1818] hover:text-white w-full mx-auto">
 
-                    <Upload className="w-4 h-4 mr-1" />
-                    {previewUrl || formData.image_url ? 'Change Picture' : 'Upload Picture'}
-                  </Button>
-                  
-                  
+                  <Upload className="w-4 h-4 mr-1" />
+                  {previewUrl || formData.image_url ? 'Change Picture' : 'Upload Picture'}
+                </Button>
+
+
                 <p className="text-xs text-gray-500 text-center">
                   Supported formats: JPG, PNG, GIF (max 5MB)
                 </p>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="doctor_name">Full Name</Label>
-              <Input
-                id="doctor_name"
-                value={formData.doctor_name}
-                onChange={(e) => handleInputChange('doctor_name', e.target.value)}
-                placeholder="Dr. John Smith"
-                required />
 
+            {/* Full Name Input */}
+            <div className="flex flex-row gap-10">
+              {/* Full Name Input takes more space */}
+              <div className="space-y-1">
+                <Label htmlFor="doctor_name">Full Name</Label>
+                <Input
+                  id="doctor_name"
+                  value={formData.doctor_name}
+                  onChange={(e) => handleInputChange('doctor_name', e.target.value)}
+                  placeholder="Dr. John Smith"
+                  required
+                  className="w-max"
+                />
+              </div>
+
+              {/* Gender Select takes less space */}
+              <div className="space-y-1">
+                <Label htmlFor="gender">Gender</Label>
+                <Select
+                  name="gender"
+                  value={formData.gender}
+                  onValueChange={(value) => handleInputChange('gender', value)}
+                  required
+                >
+                  <SelectTrigger id="gender" className="w-[150%] mt-1">
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+
             <Input type="hidden" name="online_id" value={doctorData.online_id} />
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="education">Education</Label>
@@ -221,7 +253,6 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
                 onChange={(e) => handleInputChange('education', e.target.value)}
                 placeholder="MBBS, MD (Specialization)"
                 required />
-
             </div>
 
             <div className="space-y-2">
@@ -262,9 +293,20 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
                 onChange={(e) => handleInputChange('location', e.target.value)}
                 placeholder="Delhi"
                 required />
-
             </div>
-
+            <div className="space-y-2">
+              <Label htmlFor="mobile">Mobile Number</Label>
+              <Input
+                id="mobile"
+                name="mobile"
+                type="tel"
+                value={formData.mobile}
+                onChange={(e) => handleInputChange('mobile', e.target.value)}
+                placeholder="Enter your mobile number"
+                required
+                className="mt-1"
+              />
+            </div>
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="address">Address</Label>
               <Textarea

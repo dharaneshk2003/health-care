@@ -57,16 +57,13 @@ export default function DoctorRegisterForm({ message }: { message: Message }) {
 
           <div className="my-2">
             <Label htmlFor="name">Doctor Name</Label>
-            <Input id="name" name="name" required className="mt-1" placeholder="doctor name"/>
+            <Input id="name" name="name" required className="mt-1" placeholder="doctor name" />
           </div>
 
           <div className="my-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" required className="mt-1" placeholder="email"/>
+            <Input id="email" name="email" type="email" required className="mt-1" placeholder="email" />
           </div>
-
-          
-
 
           <div className="flex gap-4 my-2">
             <div className="w-1/2">
@@ -97,26 +94,40 @@ export default function DoctorRegisterForm({ message }: { message: Message }) {
               />
             </div>
           </div>
-          
+
           <div className="my-2">
             <Label htmlFor="education">Education</Label>
-            <Input id="education" name="education" required className="mt-1" placeholder="education"/>
+            <Input id="education" name="education" required className="mt-1" placeholder="education" />
           </div>
 
           <div className="my-2">
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              minLength={6}
-              required
-              className="mt-1"
-              placeholder="enter password"
-            />
+            <div className="flex items-center gap-0 mt-1">
+              <Input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                minLength={6}
+                required
+                placeholder="Enter password"
+                className="flex-1 rounded-r-none"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="h-full border border-gray-200 py-[11px] border-l-0 m-0"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </Button>
+            </div>
+          </div>
 
-            <div className="my-2">
-              <Label htmlFor="gender" className="">Gender</Label>
+          <div className="flex gap-4 my-2">
+            {/* Gender Select */}
+            <div className="w-1/2">
+              <Label htmlFor="gender">Gender</Label>
               <Select name="gender" required>
                 <SelectTrigger id="gender" className="mt-1">
                   <SelectValue placeholder="Select gender" />
@@ -128,16 +139,22 @@ export default function DoctorRegisterForm({ message }: { message: Message }) {
                 </SelectContent>
               </Select>
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-[590px] top-[553px] h-auto"
-            >
-              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-            </Button>
+
+            {/* Mobile Input */}
+            <div className="w-1/2">
+              <Label htmlFor="mobile">Mobile Number</Label>
+              <Input
+                id="mobile"
+                name="mobile"
+                type="tel"
+                placeholder="Enter your mobile number"
+                required
+                className="mt-1"
+              />
+            </div>
           </div>
+
+
 
           <SubmitButton pendingText="Signing up..." className="w-full mt-2">
             Sign up

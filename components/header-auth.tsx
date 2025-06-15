@@ -5,7 +5,7 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/server";
 import { Heart, Bell, Settings, LogOut } from "lucide-react"
-import { getLoggedInDoctorDetails } from '../app/backend.ts';
+import { getLoggedInDoctorDetails, getLoggedInPatientDetails } from '../app/backend.ts';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 export default async function AuthButton() {
   const isPresent = await getLoggedInDoctorDetails();
   const supabase = await createClient();
+  let isPatientPresent = await getLoggedInPatientDetails();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -78,8 +79,7 @@ export default async function AuthButton() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
-                {isPresent.present ? <AvatarImage src={isPresent.data.image_url} alt="User"/> : <AvatarImage src="https://media.gettyimages.com/id/1777940832/vector/healthcare-concept-vector-illustration-stethoscope-doctors-illness-patients.jpg?s=612x612&w=0&k=20&c=xMq7jzLoyR9anba0KBLphv9i4uX3HK4zPkIwYkgG57Y=" alt="User" />}
-                
+                {isPresent.present ? <AvatarImage src={isPresent.data.image_url} alt="User" /> : <AvatarImage src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop&crop=face" alt="User" />}
                 <AvatarFallback>D</AvatarFallback>
               </Avatar>
             </Button>
@@ -88,14 +88,14 @@ export default async function AuthButton() {
             <DropdownMenuLabel className="font-normal">
               <Link href="/dashboard">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{name}</p>
+                  <p className="text-sm font-medium leading-none">{isPresent?.data?.doctor_name || name}</p>
                   <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                 </div>
               </Link>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <><Link href="/profile">
-            <DropdownMenuItem>Profile</DropdownMenuItem></Link></>
+              <DropdownMenuItem>Profile</DropdownMenuItem></Link></>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={signOutAction}>
               <LogOut className="h-4 w-4 mr-2" />
@@ -114,7 +114,9 @@ export default async function AuthButton() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="https://media.gettyimages.com/id/1777940832/vector/healthcare-concept-vector-illustration-stethoscope-doctors-illness-patients.jpg?s=612x612&w=0&k=20&c=xMq7jzLoyR9anba0KBLphv9i4uX3HK4zPkIwYkgG57Y=" alt="User" />
+                {isPatientPresent?.present ? (<AvatarImage src={isPatientPresent?.data.image_url} alt="User" />
+                ) :
+                  (<AvatarImage src="https://media.gettyimages.com/id/1777940832/vector/healthcare-concept-vector-illustration-stethoscope-doctors-illness-patients.jpg?s=612x612&w=0&k=20&c=xMq7jzLoyR9anba0KBLphv9i4uX3HK4zPkIwYkgG57Y=" alt="User" />)}
                 <AvatarFallback>P</AvatarFallback>
               </Avatar>
             </Button>
@@ -122,13 +124,13 @@ export default async function AuthButton() {
           <DropdownMenuContent className="w-auto" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{name}</p>
-                <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                <p className="text-sm font-medium leading-none">{ isPatientPresent?.present ? isPatientPresent?.data.patient_name :name}</p>
+                <p className="text-xs leading-none text-muted-foreground">{isPatientPresent?.present ? isPatientPresent?.data.email : user.email}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <><Link href="/profile">
-            <DropdownMenuItem>Profile</DropdownMenuItem></Link></>
+              <DropdownMenuItem>Profile</DropdownMenuItem></Link></>
           </DropdownMenuContent>
         </DropdownMenu>
         <Button variant="ghost" onClick={signOutAction} className="flex mb-1">

@@ -62,6 +62,7 @@ export const signUpActionDoctor = async (formData: FormData) => {
   const experience = formData.get("experience")?.toString(); // Renamed as experience in UI
   const education = formData.get("education")?.toString();
   const gender = formData.get("gender")?.toString();
+  const mobile = formData.get("mobile")?.toString();
 
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
@@ -84,7 +85,8 @@ export const signUpActionDoctor = async (formData: FormData) => {
         department,
         experience,
         education,
-        gender
+        gender,
+        mobile
       },
       emailRedirectTo: `${origin}/auth/callback`,
     },
@@ -437,21 +439,27 @@ export const getAppointmentsByReferral = async (patient_id: string) => {
 
 export const handleFileUpload = async (
   file: File,
-  online_id: string,
-  doctor_name: string
+  id: string,
+  name: string,
+  role : string
 ): Promise<string | null> => {
   const supabase = await createClient();
 
   if (!file) return null;
+  let filePath = '';
+if(role=="doctor"){
+   filePath = `doctors/${name}_${id}.jpg`;
+}else{
+   filePath = `patients/${name}_${id}.jpg`
+}
 
-  const filePath = `${doctor_name}_${online_id}.jpg`;
+// ✅ Upload file to Supabase Storage with upsert
+const { data: uploadData, error: uploadError } = await supabase.storage
+  .from("profiles")
+  .upload(filePath, file, {
+    upsert: true,
+  });
 
-  // ✅ Upload file to Supabase Storage with upsert
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from("profiles")
-    .upload(filePath, file, {
-      upsert: true,
-    });
 
   if (uploadError) {
     console.warn("Upload error:", uploadError.message);
@@ -477,7 +485,6 @@ export const handleFileUpload = async (
 export const addDoctor = async (doctorData: Record<string, any>) => {
   const supabase = await createClient();
 
-  // ✅ Build payload cleanly and safely
   const payload = {
     online_id: doctorData.online_id,
     doctor_name: doctorData.doctor_name,
@@ -490,15 +497,17 @@ export const addDoctor = async (doctorData: Record<string, any>) => {
     available_from_time: doctorData.available_from_time,
     available_to_time: doctorData.available_to_time,
     languages: doctorData.languages,
-    consultation_fees: Number(doctorData.consultation_fees || 0),
-    ratings: Number(doctorData.rating || 3),
-    image_url: doctorData.image_url, // ✅ Already uploaded to Supabase Storage
+    consultation_fees: Number(doctorData.consultation_fees ?? 0),
+    ratings: Number(doctorData.rating ?? 3),
+    image_url: doctorData.image_url,
+    mobile : doctorData.mobile,
+    gender : doctorData.gender,
   };
 
-  // ✅ Insert into 'doctors' table
+  // 🛡 Use upsert to avoid duplicate primary key error
   const { data: inserted, error } = await supabase
     .from("doctors")
-    .insert([payload])
+    .upsert([payload], { onConflict: "online_id" })
     .select()
     .single();
 
@@ -508,6 +517,35 @@ export const addDoctor = async (doctorData: Record<string, any>) => {
 
   return { success: true, data: inserted };
 };
+
+export const addPatient = async (patientData: Record<string, any>) => {
+  const supabase = await createClient();
+
+  const payload = {
+    online_id: patientData.online_id,
+    patient_name: patientData.patient_name,
+    email: patientData.email,
+    age: Number(patientData.age ?? 0),
+    gender: patientData.gender,
+    mobile: patientData.mobile,
+    image_url: patientData.image_url,
+    user_id : patientData.user_id,
+  };
+
+  // 🛡 Use upsert to avoid duplicate primary key or conflict on unique online_id
+  const { data: inserted, error } = await supabase
+    .from("patients")
+    .upsert([payload], { onConflict: "user_id" })
+    .select()
+    .single();
+
+  if (error) {
+    return { error: error.message, formFields: payload };
+  }
+
+  return { success: true, data: inserted };
+};
+
 
 
 

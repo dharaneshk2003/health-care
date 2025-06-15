@@ -29,6 +29,8 @@ interface DoctorData {
   available_to_time: string;
   languages: string[];
   consultation_fees: number;
+  gender: string;
+  mobile : string;
 }
 
 interface AdditionalDetailsFormProps {
