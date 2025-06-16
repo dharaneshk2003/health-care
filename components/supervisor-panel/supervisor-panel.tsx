@@ -52,7 +52,7 @@ export function SupervisorPanel({ appointmentList,referralObject,departmentList 
         <main className="flex-1 py-0 pl-2">
           {currentView === "onlinePatients" && <SupervisorOnlinePatients list= {appointmentList} departmentList={departmentList}/>}
           {currentView === "refferalManagement" && <SupervisorStaffManagement referralObject={referralObject}/>}
-          {currentView === "analytics" && <SupervisorAnalytics />}
+          {/* {currentView === "analytics" && <SupervisorAnalytics />} */}
         </main>
       </div>
     </div>

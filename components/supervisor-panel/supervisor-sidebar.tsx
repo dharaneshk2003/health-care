@@ -34,14 +34,14 @@ export function SupervisorSidebar({ currentView, onNavigate }: SupervisorSidebar
             Refferal Management
           </Button>
 
-          <Button
+          {/* <Button
             variant={currentView === "analytics" ? "default" : "ghost"}
             className={`w-full justify-start ${currentView === "analytics" ? "bg-primary hover:bg-primary" : ""}`}
             onClick={() => onNavigate("analytics")}
           >
             <BarChart className="h-4 w-4 mr-2" />
             Analytics
-          </Button>
+          </Button> */}
         </nav>
         <div className="border-t mr-1">
         </div>
