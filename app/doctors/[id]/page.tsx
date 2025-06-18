@@ -1,5 +1,4 @@
 import React from 'react'
-import { createClient } from "@/utils/supabase/server";
 import { getDataWithId, userDetails } from '../../backend.ts';
 import UserBookingForm from '../../../components/UserBookingForm.tsx';
 
@@ -8,20 +7,20 @@ interface DoctorPageProps {
     id: string;
   };
 }
+
 export default async function DoctorDetailsPage({ params }: DoctorPageProps) {
-  const { id } = await params; // ✅ Fix here
+  const { id } = params; // ✅ NO await here
 
   const doctor = await getDataWithId(id);
   if (!doctor) {
-    return <div>Doctor not found</div>
+    return <div>Doctor not found</div>;
   }
 
-  let info = await userDetails();
-
+  const info = await userDetails();
 
   return (
     <div>
       <UserBookingForm doctor={doctor} patient={info} />
     </div>
-  )
+  );
 }
