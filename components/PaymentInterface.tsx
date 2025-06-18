@@ -32,14 +32,14 @@ import gpayImg from "@/components/Images/gpay.png";
 import paytmImg from "@/components/Images/paytm.png";
 import phonepeIMg from "@/components/Images/phonepe.png";
 import Image from "next/image";
-import { updateAppointmentById } from "../app/actions.ts";
+import { updateAppointmentById,createNotification } from "../app/actions.ts";
 import { useToast } from "../hooks/use-toast.ts"
 import { ToastAction } from "@/components/ui/toast"
 import { useRouter } from 'next/navigation';
 import MapboxExample from "../pages/MapboxExample.tsx";
 
 
-export default function PaymentInterface({ doctor, patient, appointment }) {
+export default function PaymentInterface({ doctor, patient, appointment,to_id }) {
   const router = useRouter();
   let details = patient?.user_metadata;
   const { toast } = useToast()
@@ -222,18 +222,49 @@ export default function PaymentInterface({ doctor, patient, appointment }) {
     });
   };
 
-  const handlePayment = () => {
+const handlePayment = async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    from_id: patient?.id,
+    to_id: to_id,
+    body: `You have a consultation from patient ${details?.name} regarding ${reason}`,
+    category: 'appointment',
+  };
+
+  try {
+    const result = await createNotification(payload);
+
+    if (!result || result.error) {
+      console.error("Failed to create notification:", result?.error || "Unknown error");
+      toast({
+        title: "Notification failed",
+        description: `Error: ${result?.error || "Unknown error"}`,
+        action: <ToastAction altText="Undo">Undo</ToastAction>,
+      });
+      return;
+    }
+
     toast({
       title: "Successfully Booked",
-      description: "Appointment booked successfully!",
+      description: "Appointment and notification created successfully!",
       action: <ToastAction altText="Undo">Undo</ToastAction>,
     });
 
-    // Wait 1.5–2 seconds before navigating
+    // Optional: Navigate after success
     setTimeout(() => {
       router.push('/doctors');
     }, 1500);
-  };
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    toast({
+      title: "Unexpected Error",
+      description: err.message || "Something went wrong",
+      action: <ToastAction altText="Undo">Undo</ToastAction>,
+    });
+  }
+};
+
 
 
 

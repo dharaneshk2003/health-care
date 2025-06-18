@@ -452,4 +452,18 @@ export const getUserNotifications = async () => {
   }
 };
 
+export const getDoctorOnlineId = async (doctorId) => {
+  let supabase = await createClient()
+  const { data, error } = await supabase
+    .from('doctors')
+    .select('online_id')
+    .eq('id', doctorId)
+    .single();
 
+  if (error) {
+    console.error('Error fetching online_id:', error.message);
+    return null;
+  }
+
+  return data?.online_id || null;
+}

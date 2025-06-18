@@ -546,6 +546,41 @@ export const addPatient = async (patientData: Record<string, any>) => {
   return { success: true, data: inserted };
 };
 
+export const createNotification = async (payload: {
+  from_id: string;
+  to_id: string;
+  body: string;
+  category: 'referal' | 'appointment';
+}) => {
+  const supabase = await createClient();
+
+  // Basic validation (optional)
+  if (!payload.from_id || !payload.to_id || !payload.body || !payload.category) {
+    return {
+      error: "Missing required fields in payload",
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("notifications")
+    .upsert([
+      {
+        from_id: payload.from_id,
+        to_id: payload.to_id,
+        body: payload.body,
+        category: payload.category,
+      },
+    ])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error inserting notification:", error.message);
+    return { error: error.message };
+  }
+
+  return { success: true, data };
+};
 
 
 
