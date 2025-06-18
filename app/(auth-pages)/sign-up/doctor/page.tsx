@@ -1,6 +1,6 @@
 // app/(auth-pages)/sign-up/page.tsx
 
-import { signUpAction } from "@/app/actions";
+
 import { SmtpMessage } from "../../smtp-message.tsx";
 import DoctorRegisterForm from "./DoctorRegisterForm.tsx";
 import { FormMessage, type Message } from "@/components/form-message";
