@@ -3,7 +3,11 @@ import PaymentInterface from '../../../../components/PaymentInterface.tsx';
 import { getDataWithId, userDetails as getPatientDetails, getAppointment,getDoctorOnlineId } from "../../../backend.ts";
 import { createClient } from "@/utils/supabase/server";
 
-export default async function ConformationPage({ params }: { params: { id: string } }) {
+type PaymentPageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function ConformationPage({ params }: DoctorPageProps) {
   const { id } = await params;
   const supabase = await createClient();
 
