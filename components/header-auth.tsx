@@ -5,7 +5,7 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/server";
 import { Heart, Bell, Settings, LogOut } from "lucide-react"
-import { getLoggedInDoctorDetails, getLoggedInPatientDetails } from '../app/backend.ts';
+import { getLoggedInDoctorDetails, getLoggedInPatientDetails,getUserNotifications } from '../app/backend.ts';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu.tsx";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-
+import Notification from "../pages/Notification.tsx";
 
 
 
@@ -23,14 +23,13 @@ export default async function AuthButton() {
   const isPresent = await getLoggedInDoctorDetails();
   const supabase = await createClient();
   let isPatientPresent = await getLoggedInPatientDetails();
+  let notifications = await getUserNotifications();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   let role = user?.user_metadata?.role;
   let name = user?.user_metadata?.name;
-
-
 
   if (!hasEnvVars) {
     return (
@@ -71,10 +70,7 @@ export default async function AuthButton() {
   return user ? (
     role == "doctor" ? (
       <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="icon">
-          <Bell className="h-5 w-5" />
-          <span className="sr-only">Notifications</span>
-        </Button>
+        <Notification messages={notifications}/>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -124,7 +120,7 @@ export default async function AuthButton() {
           <DropdownMenuContent className="w-auto" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{ isPatientPresent?.present ? isPatientPresent?.data.patient_name :name}</p>
+                <p className="text-sm font-medium leading-none">{isPatientPresent?.present ? isPatientPresent?.data.patient_name : name}</p>
                 <p className="text-xs leading-none text-muted-foreground">{isPatientPresent?.present ? isPatientPresent?.data.email : user.email}</p>
               </div>
             </DropdownMenuLabel>

@@ -7,7 +7,6 @@ export default async function Profile() {
   let isPresent = await getLoggedInDoctorDetails();
   let info = await userDetails();
   let isPatientPresent = await getLoggedInPatientDetails();
-  console.log("patient details :", isPatientPresent);
   return (
     <div>
       {info.user_metadata.role === "doctor" ? (

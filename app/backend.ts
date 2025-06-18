@@ -311,8 +311,6 @@ export const LoggedInUserByRefferals = async () => {
   return dataObject;
 };
 
-
-
 export const getLoggedInDoctorDetails = async () => {
   const supabase = await createClient();
 
@@ -341,7 +339,6 @@ export const getLoggedInDoctorDetails = async () => {
 
   return { present: true, data: doctor };
 };
-
 
 export const getUniqueDepartments = async () => {
   const supabase = await createClient();
@@ -374,7 +371,6 @@ export const getUniqueDepartments = async () => {
   return { success: true, data: departmentsWithDoctors };
 };
 
-
 export const getLoggedInPatientDetails = async () => {
   const supabase = await createClient();
 
@@ -402,6 +398,58 @@ export const getLoggedInPatientDetails = async () => {
   }
 
   return { present: true, data: patient };
+};
+
+export const getUserNotifications = async () => {
+  try {
+    const supabase = await createClient();
+
+    // Step 1: Get the logged-in user
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      const reason = userError?.message || "No user session found";
+      console.error("User Fetch Error:", reason);
+      return {
+        error: `Auth Error: ${reason}`,
+        notifications: [],
+      };
+    }
+
+    const userId = user.id;
+
+    // Step 2: Fetch notifications where to_id == user.id
+    const { data: notifications, error } = await supabase
+      .from("notifications")
+      .select("*")
+      .eq("to_id", userId)
+      .order("id", { ascending: false });
+
+    if (error) {
+      console.error("Notification Fetch Error:", {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+      });
+
+      return {
+        error: `DB Error: ${error.message} (Code: ${error.code}, Hint: ${error.hint})`,
+        notifications: [],
+      };
+    }
+
+    return { notifications };
+  } catch (e: any) {
+    console.error("Unexpected Exception:", e);
+    return {
+      error: `Unexpected Error: ${e.message ?? e.toString()}`,
+      notifications: [],
+    };
+  }
 };
 
 
