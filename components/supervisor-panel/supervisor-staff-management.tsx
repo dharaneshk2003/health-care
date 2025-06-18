@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import RefferdDoctorslist from "../RefferdDoctorslist.tsx"
 import RefferedByDoctorList from "../RefferedByDoctorList.tsx";
 import { Button } from "@/components/ui/button"
-export function SupervisorStaffManagement({ referralObject }) {
+export function SupervisorStaffManagement({ referralObject,referredBy }) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("user-management")
@@ -28,6 +28,8 @@ export function SupervisorStaffManagement({ referralObject }) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   const { refferal, doctors, patients } = referralObject;
+  const { refferal:refferalBy, doctors:doctorsBy, patients:patientsBy } = referredBy;
+ 
 
   const formattedPatients = refferal.map((ref, index) => {
     const patient = patients[index];
@@ -44,37 +46,23 @@ export function SupervisorStaffManagement({ referralObject }) {
     };
   });
 
+  const formattedPatientsBy = refferalBy.map((ref, index) => {
+    const patientBy = patientsBy[index];
+    const doctorBy = doctorsBy[index];
+
+    return {
+      id: patientBy.offline_id,
+      name: patientBy.name,
+      age: patientBy.age,
+      gender: patientBy.gender,
+      phone: patientBy.phone,
+      doctor: doctorBy.doctor_name,
+      department: doctorBy.department,
+    };
+  });
+ 
 
 
-  const offlinePatients = [
-    {
-      id: "PAT-001",
-      name: "Suresh Mehta",
-      age: 52,
-      gender: "Male",
-      phone: "+91 98765 43210",
-      doctor: "Dr. Rajesh Kumar",
-      department: "Cardiology",
-    },
-    {
-      id: "PAT-002",
-      name: "Meena Patel",
-      age: 45,
-      gender: "Female",
-      phone: "+91 87654 32109",
-      doctor: "Dr. Priya Sharma",
-      department: "Dermatology",
-    },
-    {
-      id: "PAT-003",
-      name: "Ravi Sharma",
-      age: 35,
-      gender: "Male",
-      phone: "+91 76543 21098",
-      doctor: "Dr. Vikram Singh",
-      department: "Orthopedic",
-    },
-  ]
   return (
     <div className="space-y-3 ml-3 w-full h-full">
       <div className="flex items-center justify-between">
@@ -125,8 +113,8 @@ export function SupervisorStaffManagement({ referralObject }) {
               </CardHeader>
               <CardContent className="grid gap-6">
                 <RefferedByDoctorList
-                  offlinePatients={formattedPatients}
-                  referralObject={referralObject}
+                  offlinePatients={formattedPatientsBy}
+                  referredBy = {referredBy}
                 />
               </CardContent>
             </Card>

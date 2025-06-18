@@ -63,30 +63,6 @@ export default function RefferdDoctorslist({ offlinePatients,referralObject }) {
                             </div>
                         </CardContent>
                         <CardFooter className="flex justify-between">
-                            <Button variant="outline" size="sm" className="flex items-center">
-                                <Edit className="h-4 w-4 mr-1" />
-                                Edit
-                            </Button>
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon">
-                                        <MoreVertical className="h-4 w-4" />
-                                        <span className="sr-only">More options</span>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>View Details</DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        {patient.status === "admitted" ? "Discharge Patient" : "Re-admit Patient"}
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>Transfer Department</DropdownMenuItem>
-                                    <DropdownMenuItem className="text-destructive">
-                                        <Trash2 className="h-4 w-4 mr-2" />
-                                        Delete Record
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
                         </CardFooter>
                     </Card>
                 ))}
