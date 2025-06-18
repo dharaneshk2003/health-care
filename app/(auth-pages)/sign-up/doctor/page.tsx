@@ -1,8 +1,8 @@
 // app/(auth-pages)/sign-up/page.tsx
 
 
-import { SmtpMessage } from "../../smtp-message.tsx";
-import DoctorRegisterForm from "./DoctorRegisterForm.tsx";
+import { SmtpMessage } from "../../smtp-message";
+import DoctorRegisterForm from "./DoctorRegisterForm";
 import { FormMessage, type Message } from "@/components/form-message";
 
 export default async function SignupPage({
