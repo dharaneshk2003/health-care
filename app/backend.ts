@@ -107,8 +107,6 @@ export const getAppointment = async (doctorId) => {
 
 
 
-
-
 export const getOfflineAppointments = async () => {
   const supabase = await createClient();
   const { data: offline_appointments, error } = await supabase.from('offline_appointments').select('*');

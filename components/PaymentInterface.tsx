@@ -225,6 +225,7 @@ export default function PaymentInterface({ doctor, patient, appointment,to_id })
 const handlePayment = async (e) => {
   e.preventDefault();
 
+  // Doctor-side notification
   const payload = {
     from_id: patient?.id,
     to_id: to_id,
@@ -232,29 +233,41 @@ const handlePayment = async (e) => {
     category: 'appointment',
   };
 
+  // Patient-side notification
+  const patientPayload = {
+    from_id: to_id,
+    to_id: patient?.id,
+    body: `Your appointment with Dr. ${doctor_name} is fixed`,
+    category: 'appointment',
+  };
+
   try {
     const result = await createNotification(payload);
+    const resultPat = await createNotification(patientPayload);
 
-    if (!result || result.error) {
-      console.error("Failed to create notification:", result?.error || "Unknown error");
+    // ❗ Corrected error logic
+    if (!result || result.error || !resultPat || resultPat.error) {
+      console.error("Failed to create notification:", result?.error || resultPat?.error || "Unknown error");
       toast({
         title: "Notification failed",
-        description: `Error: ${result?.error || "Unknown error"}`,
+        description: `Error: ${result?.error || resultPat?.error || "Unknown error"}`,
         action: <ToastAction altText="Undo">Undo</ToastAction>,
       });
       return;
     }
 
+    // ✅ Success toast
     toast({
       title: "Successfully Booked",
       description: "Appointment and notification created successfully!",
       action: <ToastAction altText="Undo">Undo</ToastAction>,
     });
 
-    // Optional: Navigate after success
+    // Redirect after short delay
     setTimeout(() => {
       router.push('/doctors');
     }, 1500);
+
   } catch (err) {
     console.error("Unexpected error:", err);
     toast({
@@ -264,6 +277,7 @@ const handlePayment = async (e) => {
     });
   }
 };
+
 
 
 

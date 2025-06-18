@@ -102,10 +102,7 @@ export default async function AuthButton() {
       </div>
     ) : (
       <div className="flex items-center space-x-4 mt-2">
-        <Button variant="ghost" size="icon">
-          <Bell className="h-5 w-5" />
-          <span className="sr-only">Notifications</span>
-        </Button>
+        <Notification messages={notifications}/>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">

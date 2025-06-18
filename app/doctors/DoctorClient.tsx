@@ -6,15 +6,17 @@ import DoctorCard from '../../components/DoctorCard';
 import AirbnbSearchBar from '../../components/ui/AirbnbSearchBar.tsx';
 import { UserCategoryFilters } from '../../components/ui/UserCategoryFilters';
 
+
 type DoctorClientProps = {
   doctorList: any[]; // Replace with correct type if available
   role: any;
   user: any;
   engagement : any;
   engagementList : any[];
+  to_doctorid : any;
 };
 
-export default function DoctorClient({ doctorList, role, user,engagement,engagementList }: DoctorClientProps) {
+export default function DoctorClient({ doctorList, role, user,engagement,engagementList,to_doctorid }: DoctorClientProps) {
   const [filteredDoctors, setFilteredDoctors] = useState(doctorList);
   const [noMatchFound, setNoMatchFound] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -59,7 +61,7 @@ export default function DoctorClient({ doctorList, role, user,engagement,engagem
       )}
 
       {/* ✅ Pass user and role to DoctorCard */}
-      <DoctorCard doctors={filteredDoctors} user={user} role={role} engagement={engagement} engagementList={engagementList}/>
+      <DoctorCard doctors={filteredDoctors} user={user} role={role} engagement={engagement} engagementList={engagementList} to_doctorid={to_doctorid}/>
     </div>
   );
 }

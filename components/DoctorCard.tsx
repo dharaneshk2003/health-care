@@ -19,8 +19,9 @@ type DoctorCardProps = {
     role: string;
     engagement: string,
     engagementList: any[];
+    to_doctorid : any;
 };
-export default function DoctorCard({ doctors, user, role, engagement, engagementList }: DoctorCardProps) {
+export default function DoctorCard({ doctors, user, role, engagement, engagementList,to_doctorid }: DoctorCardProps) {
     const handleAppointment = (id) => {
         router.push(`/doctors/${id}`);
     }
@@ -87,7 +88,7 @@ export default function DoctorCard({ doctors, user, role, engagement, engagement
                                     Already Referred
                                 </Button>
                             ) : role === 'doctor' ? (
-                                <RefferalDialogue doctor={doctor} byDoctor={user} />
+                                <RefferalDialogue doctor={doctor} byDoctor={user} to_doctorid={to_doctorid}/>
                             ) : (
                                 <Button
                                     className="bg-primary text-white mt-0 hover:bg-red-500 hover:text-white"

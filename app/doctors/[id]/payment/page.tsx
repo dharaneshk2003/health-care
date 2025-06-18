@@ -1,5 +1,5 @@
 import React from 'react'
-import PaymentInterface from '../../../../components/PaymentInterface.tsx';
+import PaymentInterface from '../../../../components/PaymentInterface';
 import { getDataWithId, userDetails as getPatientDetails, getAppointment,getDoctorOnlineId } from "../../../backend.ts";
 import { createClient } from "@/utils/supabase/server";
 
@@ -17,7 +17,6 @@ export default async function ConformationPage({ params }: DoctorPageProps) {
   if (!doctor) {
     return <div>Doctor not found</div>
   }
-  console.log("converted :",to_id);
   const patient = await getPatientDetails();
   
 

@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,15 +13,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { createReferral } from "../app/actions.ts";
+import { useToast} from "@/hooks/use-toast";
+import { createReferral,createNotification } from "../app/actions.ts";
+import { getDataWithId } from "../app/backend.ts";
 
-// Initialize Supabase client inside the client component
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export default function ReferralDialogue({ doctor, byDoctor }) {
+
+export default function ReferralDialogue({ doctor, byDoctor,to_doctorid }) {
+  console.log("by doctor :",byDoctor);
+  console.log("to_doctorid :",to_doctorid);
   const [formData, setFormData] = useState({
     patient_id: "",
     referral_id: "",
@@ -47,67 +46,88 @@ export default function ReferralDialogue({ doctor, byDoctor }) {
     setFormData((prev) => ({ ...prev, referral_id: newId }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  const { patient_id, referral_id, by_doctorid, to_doctorid } = formData;
 
-    const { patient_id, referral_id, by_doctorid, to_doctorid } = formData;
+  // Input validation
+  if (!patient_id.trim() || !referral_id.trim()) {
+    toast({
+      title: "Missing Information",
+      description: "Please enter both Patient ID and Referral ID.",
+      variant: "destructive",
+    });
+    return;
+  }
 
-    if (!patient_id.trim() || !referral_id.trim()) {
-      toast({
-        title: "Missing Information",
-        description: "Please enter both Patient ID and Referral ID.",
-        variant: "destructive",
-      });
-      return;
+  setIsSubmitting(true);
+
+  try {
+    // Step 1: Referral API call
+    const formDataObj = new FormData();
+    formDataObj.append("patient_id", patient_id);
+    formDataObj.append("referral_id", referral_id);
+    formDataObj.append("by_doctorid", by_doctorid ?? "");
+    formDataObj.append("to_doctorid", to_doctorid ?? "");
+
+    const referralResult = await createReferral(formDataObj);
+
+    if (referralResult?.error) {
+      throw new Error(referralResult.error);
     }
 
-
-    setIsSubmitting(true);
-
-    try {
-      // Prepare a FormData object to pass to createReferral
-      const formDataObj = new FormData();
-      formDataObj.append("patient_id", formData.patient_id);
-      formDataObj.append("referral_id", formData.referral_id);
-      formDataObj.append("by_doctorid", formData.by_doctorid ?? "");
-      formDataObj.append("to_doctorid", formData.to_doctorid ?? "");
+    // Referral successful
+    toast({
+      title: "Referral Successful",
+      description: `Patient ${patient_id} referred to ${doctor?.doctor_name ?? "doctor"} with referral ID ${referral_id}.`,
+    });
 
 
-      const result = await createReferral(formDataObj);
+    // Step 2: Notification payload
+    const notificationPayload = {
+      from_id: byDoctor?.id,
+      to_id: doctor?.online_id,
+      body: `You got a  referral from ${to_doctorid} ?? "unknown"}`,
+      category: 'appointment',
+    };
 
+    console.log("Notification Payload:", notificationPayload);
 
-      if (result.error) {
-        toast({
-          title: "Referral Failed",
-          description: result.error,
-          variant: "destructive",
-        });
-        console.error("Referral error:", result.error);
-      } else {
-        toast({
-          title: "Referral Successful",
-          description: `Patient ${patient_id} referred to ${doctor?.doctor_name} with referral ID ${referral_id}.`,
-        });
-        // Reset form with default doctor ids
-        setFormData({
-          patient_id: "",
-          referral_id: "",
-          by_doctorid: byDoctor?.id,
-          to_doctorid: doctor?.id,
-        });
-      }
-      window.location.reload();
-    } catch (err) {
-      toast({
-        title: "Referral Failed",
-        description: "An error occurred while processing the referral.",
-        variant: "destructive",
-      });
-      console.error("Referral error:", err);
-    } finally {
-      setIsSubmitting(false);
+    // Step 3: Notification API call
+    const notifResult = await createNotification(notificationPayload);
+
+    if (notifResult?.error) {
+      throw new Error(notifResult.error);
     }
-  };
+
+    // Notification success
+    toast({
+      title: "Notification Sent",
+      description: "Notification successfully sent to the referred doctor.",
+    });
+
+    // Reset form
+    setFormData({
+      patient_id: "",
+      referral_id: "",
+      by_doctorid: byDoctor?.id,
+      to_doctorid: doctor?.id,
+    });
+    window.location.reload();
+
+  } catch (err: any) {
+    console.error("Submission error:", err);
+    toast({
+      title: "Action Failed",
+      description: err?.message || "An unexpected error occurred.",
+      variant: "destructive",
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+
 
 
   return (
