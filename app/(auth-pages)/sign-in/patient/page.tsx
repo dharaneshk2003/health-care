@@ -1,6 +1,6 @@
 // app/login/page.tsx
 import type { Message } from "@/components/form-message";
-import PatientLoginForm from "./PatientLoginForm.tsx";
+import PatientLoginForm from "./PatientLoginForm";
 
 export default async function LoginPage({
   searchParams,
