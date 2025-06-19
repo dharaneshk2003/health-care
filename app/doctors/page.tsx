@@ -28,7 +28,6 @@ export default async function DoctorPage() {
       user={user}
       engagement={engagement}
       engagementList={engagementList}
-      to_doctorid={metadata.sub}
     />
   );
 }

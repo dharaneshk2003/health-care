@@ -14,14 +14,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast} from "@/hooks/use-toast";
-import { createReferral,createNotification } from "../app/actions.ts";
-import { getDataWithId } from "../app/backend.ts";
+import { createReferral,createNotification,getDoctorWithId } from "../app/actions.ts";
 
 
 
-export default function ReferralDialogue({ doctor, byDoctor,to_doctorid }) {
-  console.log("by doctor :",byDoctor);
-  console.log("to_doctorid :",to_doctorid);
+export default function ReferralDialogue({ doctor, byDoctor,}) {
   const [formData, setFormData] = useState({
     patient_id: "",
     referral_id: "",
@@ -63,69 +60,91 @@ const handleSubmit = async (e: React.FormEvent) => {
   setIsSubmitting(true);
 
   try {
-    // Step 1: Referral API call
+    // Step 1: Get referred doctor's details
+    const to_doctor_details = await getDoctorWithId(to_doctorid);
+    if (!to_doctor_details) {
+      throw new Error("Referred doctor not found.");
+    }
+
+    console.log("By Doctor:", byDoctor);
+    console.log("To Doctor:", to_doctor_details);
+
+    // Step 2: Prepare and send referral
     const formDataObj = new FormData();
     formDataObj.append("patient_id", patient_id);
     formDataObj.append("referral_id", referral_id);
     formDataObj.append("by_doctorid", by_doctorid ?? "");
     formDataObj.append("to_doctorid", to_doctorid ?? "");
 
-    const referralResult = await createReferral(formDataObj);
+    console.log("Referral Payload:");
+    for (const [key, value] of formDataObj.entries()) {
+      console.log(key, value);
+    }
 
+    const referralResult = await createReferral(formDataObj);
     if (referralResult?.error) {
       throw new Error(referralResult.error);
     }
 
-    // Referral successful
     toast({
       title: "Referral Successful",
-      description: `Patient ${patient_id} referred to ${doctor?.doctor_name ?? "doctor"} with referral ID ${referral_id}.`,
+      description: `Patient ${patient_id} referred to ${to_doctor_details.doctor_name} with referral ID ${referral_id}.`,
     });
 
-
-    // Step 2: Notification payload
-    const notificationPayload = {
+    // Step 3: Prepare notifications
+    const toDoctorNotification = {
       from_id: byDoctor?.id,
-      to_id: doctor?.online_id,
-      body: `You got a  referral from ${to_doctorid} ?? "unknown"}`,
-      category: 'appointment',
+      to_id: to_doctor_details.online_id,
+      body: `You got a referral from Dr. ${byDoctor?.user_metadata?.name ?? "Unknown"}`,
+      category: "appointment",
     };
 
-    console.log("Notification Payload:", notificationPayload);
+    const fromDoctorNotification = {
+      from_id: to_doctor_details.online_id,
+      to_id: byDoctor?.id,
+      body: `You gave a referral to Dr. ${to_doctor_details.doctor_name}`,
+      category: "appointment",
+    };
 
-    // Step 3: Notification API call
-    const notifResult = await createNotification(notificationPayload);
+    console.log("Notification → To Doctor:", toDoctorNotification);
+    console.log("Notification → From Doctor:", fromDoctorNotification);
 
-    if (notifResult?.error) {
-      throw new Error(notifResult.error);
+    // Step 4: Send notifications
+    const notifToDoctor = await createNotification(toDoctorNotification);
+    const notifToSender = await createNotification(fromDoctorNotification);
+
+    if (notifToDoctor?.error || notifToSender?.error) {
+      throw new Error(notifToDoctor?.error || notifToSender?.error);
     }
 
-    // Notification success
     toast({
-      title: "Notification Sent",
-      description: "Notification successfully sent to the referred doctor.",
+      title: "Notifications Sent",
+      description: "Notifications sent to both doctors successfully.",
     });
 
-    // Reset form
+    // Step 5: Reset form
     setFormData({
       patient_id: "",
       referral_id: "",
       by_doctorid: byDoctor?.id,
-      to_doctorid: doctor?.id,
+      to_doctorid: to_doctor_details.id,
     });
+
+    // Optionally reload or navigate
     window.location.reload();
 
   } catch (err: any) {
     console.error("Submission error:", err);
     toast({
       title: "Action Failed",
-      description: err?.message || "An unexpected error occurred.",
+      description: err.message || "An unexpected error occurred.",
       variant: "destructive",
     });
   } finally {
     setIsSubmitting(false);
   }
 };
+
 
 
 

@@ -585,5 +585,18 @@ export const createNotification = async (payload: {
 
 
 
+export const getDoctorWithId = async (id) => {
+  const supabase = await createClient();
+  const { data: doctor, error } = await supabase
+    .from('doctors')
+    .select('*')
+    .eq('id', id)
+    .single();
 
+  if (error) {
+    console.error("Error fetching doctor by ID:", error.message);
+    return null;
+  }
+  return doctor;
+}
 
