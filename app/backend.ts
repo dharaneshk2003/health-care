@@ -235,34 +235,58 @@ export const LoggedInUserRefferals = async () => {
   return dataObject;
 };
 
+export const getDoctorDetailsByOnlineId = async (onlineId) => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('doctors')
+    .select('id, doctor_name, department') // Add any other fields needed
+    .eq('online_id', onlineId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching doctor details:", error.message);
+    return null;
+  }
+
+  return data;
+};
+
+export const getDoctorDetailsById = async (id) => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('doctors')
+    .select('id, doctor_name, department')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error("Error fetching doctor by ID:", error.message);
+    return null;
+  }
+
+  return data;
+};
+
 export const LoggedInUserByRefferals = async () => {
   const supabase = await createClient();
 
-  // Step 1: Get the logged-in user
+  // Step 1: Get logged-in user
   const {
     data: { user },
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError || !user) {
-    return [];
-  }
+  if (userError || !user) return { refferal: [], doctors: [], patients: [] };
 
-  // Step 2: Get the doctor ID using online_id (auth user ID)
-  const { data: doctorData, error: doctorError } = await supabase
-    .from('doctors')
-    .select('id')
-    .eq('online_id', user.id)
-    .single();
-
-  if (doctorError || !doctorData) {
-    console.error('Error fetching doctor info:', doctorError?.message);
-    return [];
-  }
+  // Step 2: Get doctor details of logged-in user to get their numeric ID
+  const doctorData = await getDoctorDetailsByOnlineId(user.id);
+  if (!doctorData) return { refferal: [], doctors: [], patients: [] };
 
   const doctorId = doctorData.id;
 
-  // Step 3: Fetch referrals where the logged-in doctor is the receiver
+  // Step 3: Fetch all referrals where current doctor is the receiver
   const { data: referrals, error: referralError } = await supabase
     .from('refferals')
     .select('*')
@@ -270,44 +294,54 @@ export const LoggedInUserByRefferals = async () => {
 
   if (referralError) {
     console.error('Error fetching referrals:', referralError.message);
-    return null;
+    return { refferal: [], doctors: [], patients: [] };
   }
 
-  // Step 4: Fetch doctor data for each by_doctorid (referring doctor)
-  const referringDoctors = await Promise.all(
-    referrals.map((referral) => getDataWithId(referral.to_doctorid))
+  // Step 4: Fetch doctor details for each by_doctorid
+  const doctorDetailsList = await Promise.all(
+    referrals.map(async (ref) => {
+      const details = await getDoctorDetailsByOnlineId(ref.by_doctorid);
+      return (
+        details || {
+          doctor_name: undefined,
+          department: undefined,
+        }
+      );
+    })
   );
 
-  const formattedDoctors = referringDoctors.map((doc) => ({
-    doctor_name: doc?.doctor_name,
-    department: doc?.department,
-  }));
+  // Step 5: Fetch patient info for each referral
+  const patientDetailsList = await Promise.all(
+    referrals.map(async (ref) => {
+      const patArr = await getAppointmentsByReferral(ref.patient_id);
+      const pat = Array.isArray(patArr) ? patArr[0] : null;
 
-  // Step 5: Fetch patient data for each referral
-  const patients = await Promise.all(
-    referrals.map((referral) => getAppointmentsByReferral(referral.patient_id))
+      return pat
+        ? {
+            name: pat.name,
+            age: pat.age,
+            gender: pat.gender,
+            offline_id: pat.offline_id,
+            phone: pat.phone,
+          }
+        : {
+            name: undefined,
+            age: undefined,
+            gender: undefined,
+            offline_id: ref.patient_id,
+            phone: undefined,
+          };
+    })
   );
 
-  const formattedPatients = patients.map((patArr) => {
-    const pat = Array.isArray(patArr) ? patArr[0] : undefined;
-    return {
-      name: pat?.name,
-      age: pat?.age,
-      gender: pat?.gender,
-      offline_id: pat?.offline_id,
-      phone: pat?.phone,
-    };
-  });
-
-  // Final data object
-  const dataObject = {
+  return {
     refferal: referrals,
-    doctors: formattedDoctors,
-    patients: formattedPatients,
+    doctors: doctorDetailsList,
+    patients: patientDetailsList,
   };
-
-  return dataObject;
 };
+
+
 
 export const getLoggedInDoctorDetails = async () => {
   const supabase = await createClient();

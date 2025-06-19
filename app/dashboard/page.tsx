@@ -11,6 +11,7 @@ export default async function Dashboard() {
   let userRefferals = await LoggedInUserRefferals();
   let userByRefferals = await LoggedInUserByRefferals();
   let departments = await getUniqueDepartments();
+  console.log(userByRefferals);
   return (
    <SupervisorPanel
     appointmentList={offlineAppointments}
