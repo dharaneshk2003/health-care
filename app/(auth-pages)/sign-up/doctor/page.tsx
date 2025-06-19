@@ -1,4 +1,3 @@
-// app/(auth-pages)/sign-up/page.tsx
 
 
 import { SmtpMessage } from "../../smtp-message";

@@ -1,5 +1,5 @@
 import React from 'react'
-import MapboxExample from '../../pages/MapboxExample.tsx'
+import MapboxExample from '../../pages/MapboxExample'
 export default function MapPage() {
   return (
     <div>

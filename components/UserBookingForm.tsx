@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import MapboxExample from "../pages/MapboxExample.tsx";
+import MapboxExample from "../pages/MapboxExample";
 import { formatISO } from 'date-fns';
 import { ArrowLeft, Calendar, Clock, User, Info, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"

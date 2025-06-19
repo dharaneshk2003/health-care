@@ -1,5 +1,3 @@
-// app/about/page.tsx or pages/about.tsx
-
 import { Metadata } from "next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";

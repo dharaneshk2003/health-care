@@ -17,7 +17,7 @@ import {
     Video,
     User
 } from 'lucide-react';
-import MapboxExample from '../../../../pages/MapboxExample.tsx';
+import MapboxExample from '../../../../pages/MapboxExample';
 interface Doctor {
     id: number;
     doctor_name: string;

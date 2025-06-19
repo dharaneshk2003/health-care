@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import BarGraph from "../Graphs/BarGraph.tsx"
-import { PieChartView } from "../Graphs/PieChartView.tsx"
-import BarGraphCompare from "../Graphs/BarGraphCompare.tsx"
-import { PieChartRevenue } from "../Graphs/PieChartRevenue.tsx"
+import BarGraph from "../Graphs/BarGraph"
+import { PieChartView } from "../Graphs/PieChartView"
+import BarGraphCompare from "../Graphs/BarGraphCompare"
+import { PieChartRevenue } from "../Graphs/PieChartRevenue"
 export function SupervisorAnalytics() {
   const [timeRange, setTimeRange] = useState("month")
 

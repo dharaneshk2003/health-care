@@ -1,7 +1,7 @@
 import React from 'react'
 import { createClient } from "@/utils/supabase/server";
 import { getDataWithId, userDetails } from '../../backend.ts';
-import UserBookingForm from '../../../components/UserBookingForm.tsx';
+import UserBookingForm from '../../../components/UserBookingForm';
 
 type DoctorPageProps = {
   params: Promise<{ id: string }>;

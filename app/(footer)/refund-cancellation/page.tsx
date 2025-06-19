@@ -1,4 +1,4 @@
-// app/refund-cancellation/page.tsx or pages/refund-cancellation.tsx
+
 
 import { Metadata } from "next";
 import Link from "next/link";

@@ -11,7 +11,7 @@ import {
 import { Button } from "../components/ui/button"
 import { Star } from "lucide-react";
 import { FaStar } from "react-icons/fa";
-import RefferalDialogue from './RefferalDialogue.tsx';
+import RefferalDialogue from './RefferalDialogue';
 
 type DoctorCardProps = {
     doctors: any[]; // Replace with accurate type if you have one

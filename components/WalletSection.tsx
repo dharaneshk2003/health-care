@@ -1,4 +1,4 @@
-// components/WalletSection.tsx
+
 "use client";
 import { Input } from "@/components/ui/input";
 import amazonPayImg from "@/components/Images/amazon_pay.png";

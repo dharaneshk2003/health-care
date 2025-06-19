@@ -36,7 +36,7 @@ import { updateAppointmentById,createNotification } from "../app/actions.ts";
 import { useToast } from "../hooks/use-toast.ts"
 import { ToastAction } from "@/components/ui/toast"
 import { useRouter } from 'next/navigation';
-import MapboxExample from "../pages/MapboxExample.tsx";
+import MapboxExample from "../pages/MapboxExample";
 
 
 export default function PaymentInterface({ doctor, patient, appointment,to_id }) {

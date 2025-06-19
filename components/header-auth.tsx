@@ -13,9 +13,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu.tsx";
+} from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import Notification from "../pages/Notification.tsx";
+import Notification from "../pages/Notification";
 
 
 

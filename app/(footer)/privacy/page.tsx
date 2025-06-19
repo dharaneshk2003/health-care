@@ -1,5 +1,3 @@
-// app/privacy-security/page.tsx or pages/privacy-security.tsx
-
 import { Metadata } from "next";
 import { Card, CardContent } from "../../../components/ui/card"; // shadcn/ui component
 import { Separator } from "../../../components/ui/separator"; // shadcn/ui component

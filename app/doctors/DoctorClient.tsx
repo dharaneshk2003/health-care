@@ -1,9 +1,7 @@
-// DoctorClient.tsx
 'use client';
-
 import { useState } from 'react';
 import DoctorCard from '../../components/DoctorCard';
-import AirbnbSearchBar from '../../components/ui/AirbnbSearchBar.tsx';
+import AirbnbSearchBar from '../../components/ui/AirbnbSearchBar';
 import { UserCategoryFilters } from '../../components/ui/UserCategoryFilters';
 
 

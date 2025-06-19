@@ -1,4 +1,3 @@
-// app/login/page.tsx
 import type { Message } from "@/components/form-message";
 import PatientLoginForm from "./PatientLoginForm";
 
