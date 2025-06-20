@@ -1,4 +1,5 @@
 "use client";
+import AppointmentDemo from '../../AppointmentDemo.tsx';
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,12 +13,13 @@ import {
   Calendar,
   UserCircle,
   Edit3,
-  IdCard } from
-'lucide-react';
+  IdCard
+} from
+  'lucide-react';
 import EditPatientDialog from './EditPatientDialog';
 
 export interface Patient {
-  role : string;
+  role: string;
   online_id: string;
   patient_name: string;
   email: string;
@@ -25,23 +27,23 @@ export interface Patient {
   gender: 'male' | 'female' | 'other';
   mobile: string;
   image_url: string;
-  user_id:any // Can be URL or base64
+  user_id: any // Can be URL or base64
 }
 
 interface PatientProfileProps {
   patientDetails?: Patient;
 }
 
-const PatientProfile = ({ patientDetails,existingData }) => {
+const PatientProfile = ({ patientDetails, existingData,userAppointments }) => {
   const defaultPatient: Patient = {
     role: patientDetails.role,
-    user_id : patientDetails.sub,
+    user_id: patientDetails.sub,
     online_id: existingData?.online_id || null,
     patient_name: existingData?.patient_name || patientDetails.name,
     email: existingData?.email || patientDetails.email,
     age: existingData?.age || patientDetails.age,
     gender: existingData?.gender || patientDetails.gender,
-    mobile: existingData?.mobile || patientDetails.mobile ,
+    mobile: existingData?.mobile || patientDetails.mobile,
     image_url: existingData?.image_url ||
       'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
   };
@@ -78,10 +80,10 @@ const PatientProfile = ({ patientDetails,existingData }) => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8" data-id="p06mqp2m1" data-path="src/components/PatientProfile.tsx">
+    <div className="min-h-screen bg-white p-4 md:p-8" data-id="p06mqp2m1" data-path="src/components/PatientProfile.tsx">
       <div className="max-w-4xl mx-auto" data-id="gq411e7bl" data-path="src/components/PatientProfile.tsx">
         <div className="text-center mb-8" data-id="vzmi6w79o" data-path="src/components/PatientProfile.tsx">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2" data-id="ek9c43mw5" data-path="src/components/PatientProfile.tsx">
+          <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2" data-id="ek9c43mw5" data-path="src/components/PatientProfile.tsx">
             Patient Profile
           </h1>
           <p className="text-gray-600" data-id="bn119ujv9" data-path="src/components/PatientProfile.tsx">Manage and view patient information</p>
@@ -103,7 +105,7 @@ const PatientProfile = ({ patientDetails,existingData }) => {
                   {getInitials(patient.patient_name)}
                 </AvatarFallback>
               </Avatar>
-              
+
               <div className="space-y-2" data-id="k1pvjror3" data-path="src/components/PatientProfile.tsx">
                 <CardTitle className="text-2xl md:text-3xl font-bold text-gray-900" data-id="nxjtbv5xt" data-path="src/components/PatientProfile.tsx">
                   {patient.patient_name}
@@ -137,7 +139,7 @@ const PatientProfile = ({ patientDetails,existingData }) => {
                   <User className="w-5 h-5 mr-2" style={{ color: '#bd1818' }} data-id="w5777srbs" data-path="src/components/PatientProfile.tsx" />
                   Personal Information
                 </h3>
-                
+
                 <div className="space-y-4" data-id="av9oeow9r" data-path="src/components/PatientProfile.tsx">
                   <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg" data-id="teck42edr" data-path="src/components/PatientProfile.tsx">
                     <Calendar className="w-5 h-5 text-gray-500" data-id="62n3c5r13" data-path="src/components/PatientProfile.tsx" />
@@ -165,7 +167,7 @@ const PatientProfile = ({ patientDetails,existingData }) => {
                   <Mail className="w-5 h-5 mr-2" style={{ color: '#bd1818' }} data-id="s2upfc8af" data-path="src/components/PatientProfile.tsx" />
                   Contact Information
                 </h3>
-                
+
                 <div className="space-y-4" data-id="jpnmueq6k" data-path="src/components/PatientProfile.tsx">
                   <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg" data-id="nl33bfhq0" data-path="src/components/PatientProfile.tsx">
                     <Mail className="w-5 h-5 text-gray-500" data-id="ti5tdxya0" data-path="src/components/PatientProfile.tsx" />
@@ -195,21 +197,21 @@ const PatientProfile = ({ patientDetails,existingData }) => {
                 </div>
                 <Badge
                   className="bg-green-100 text-green-800 border-green-200" data-id="lrt3qoz7s" data-path="src/components/PatientProfile.tsx">
-
                   Active
                 </Badge>
               </div>
             </div>
           </CardContent>
         </Card>
-
         <EditPatientDialog
           patient={patient}
           isOpen={isEditDialogOpen}
           onClose={() => setIsEditDialogOpen(false)}
           onSave={handleSavePatient} data-id="i40jqg0zi" data-path="src/components/PatientProfile.tsx" />
-
       </div>
+      <Card className="mt-4 bg-white">
+        <AppointmentDemo userAppointments={userAppointments}/>
+      </Card>
     </div>);
 
 };

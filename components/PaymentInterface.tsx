@@ -266,6 +266,7 @@ const handlePayment = async (e) => {
     // Redirect after short delay
     setTimeout(() => {
       router.push('/doctors');
+      window.location.reload();
     }, 1500);
 
   } catch (err) {

@@ -37,7 +37,6 @@ export const getAllData = async () => {
   return doctors;
 };
 
-
 export const getDataWithId = async (id) => {
   const supabase = await createClient();
   const { data: doctor, error } = await supabase
@@ -84,8 +83,6 @@ export const getOnlineAppointments = async () => {
   return data;
 };
 
-
-
 export const getAppointment = async (doctorId) => {
   const supabase = await createClient();
 
@@ -104,8 +101,6 @@ export const getAppointment = async (doctorId) => {
 
   return data;
 };
-
-
 
 export const getOfflineAppointments = async () => {
   const supabase = await createClient();
@@ -341,8 +336,6 @@ export const LoggedInUserByRefferals = async () => {
   };
 };
 
-
-
 export const getLoggedInDoctorDetails = async () => {
   const supabase = await createClient();
 
@@ -499,3 +492,71 @@ export const getDoctorOnlineId = async (doctorId) => {
 
   return data?.online_id || null;
 }
+
+export const userAppointmentList = async () => {
+  const supabase = await createClient();
+  const appointments = await LoggedInUserAppointments();
+
+  if (!appointments || appointments.length === 0) {
+    return {
+      appointment: [],
+      doctor: [],
+      patient: {}
+    };
+  }
+
+  const doctorIds = [...new Set(appointments.map(app => app.doctor_id))];
+  const patientId = appointments[0].patient_id; // All appointments belong to the same user
+
+  // Fetch doctor details
+  const { data: doctorDetails, error: doctorError } = await supabase
+    .from('doctors')
+    .select('*')
+    .in('id', doctorIds);
+
+  if (doctorError) {
+    console.error("Error fetching doctor details:", doctorError.message);
+    return null;
+  }
+
+  // Fetch patient detail
+  const { data: patientDetails, error: patientError } = await supabase
+    .from('patients')
+    .select('*')
+    .eq('user_id', patientId)
+    .single();
+
+  if (patientError) {
+    console.error("Error fetching patient details:", patientError.message);
+    return null;
+  }
+
+  return {
+    appointment: appointments,
+    doctor: doctorDetails || [],
+    patient: patientDetails || {}
+  };
+};
+
+export const transformToSampleAppointments = async() => {
+  const { appointment, doctor } = await userAppointmentList();
+
+  // Create a mapping for doctor_id → doctor object for easy lookup
+  const doctorMap = new Map(doctor.map(doc => [doc.id, doc]));
+
+  const formattedAppointments = appointment.map(app => {
+    const doc = doctorMap.get(app.doctor_id);
+
+    return {
+      id: app.id.toString(),
+      doctorName: doc?.doctor_name || 'Unknown Doctor',
+      specialty: doc?.department || 'General',
+      appointmentDate: app.appointment_date,
+      appointmentTime: app.appointment_time,
+      appointmentType: app.appointment_type
+    };
+  });
+
+  return formattedAppointments;
+};
+
