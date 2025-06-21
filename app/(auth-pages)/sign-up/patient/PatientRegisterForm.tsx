@@ -108,7 +108,7 @@ export default function PatientRegisterForm({ message }: { message: Message }) {
       <CardFooter className="flex flex-col space-y-2">
         <p className="text-sm text-center text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="text-primary font-medium underline">
+          <Link href="/sign-in/patient" className="text-primary font-medium underline">
             Sign in
           </Link>
         </p>
