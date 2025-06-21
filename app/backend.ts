@@ -104,13 +104,29 @@ export const getAppointment = async (doctorId) => {
 
 export const getOfflineAppointments = async () => {
   const supabase = await createClient();
-  const { data: offline_appointments, error } = await supabase.from('offline_appointments').select('*');
-  if (error) {
-    console.error("Error fetching offline appointments :", error.message);
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
     return [];
   }
+
+  
+  const { data: offline_appointments, error } = await supabase
+    .from('offline_appointments')
+    .select('*')
+    .eq('user_id', user.id); // Filter by logged-in user's ID
+
+  if (error) {
+    console.error("Error fetching offline appointments:", error.message);
+    return [];
+  }
+
   return offline_appointments;
 };
+
 
 
 export const LoggedInUserAppointments = async () => {

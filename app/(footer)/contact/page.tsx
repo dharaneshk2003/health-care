@@ -19,24 +19,29 @@ export default function ContactPage() {
 
         <Card className="border border-gray-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-2xl text-white">Get in Touch</CardTitle>
+            <CardTitle className="text-2xl text-primary">Get in Touch</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold text-white">Phone</h3>
+              <h3 className="text-lg font-semibold text-primary">Phone</h3>
               <p className="text-gray-600">
-                <a href="tel:+918617219004" className="hover:text-white">
+                <a href="tel:+918617219004" className="hover:text-black">
                   +91 8617219004
                 </a>
               </p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-white">Email</h3>
+              <h3 className="text-lg font-semibold text-primary">Email</h3>
               <p className="text-gray-600">
-                <a href="mailto:hindsvaasthseva@gmail.com" className="hover:text-white">
+                <a href="mailto:hindsvaasthseva@gmail.com" className="hover:text-black">
                   hindsvaasthseva@gmail.com
                 </a>
               </p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-primary">Address</h3>
+              <p className="text-gray-600">304 K.K.Mazumdar Road,</p>
+              <p className="text-gray-600">Kolkata-75</p>
             </div>
           </CardContent>
           <CardFooter className="flex justify-center">

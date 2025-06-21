@@ -335,6 +335,19 @@ export const updateAppointmentById = async (payload) => {
 
 export const createOfflineAppointment = async (prev: any, formData: FormData) => {
   const supabase = await createClient();
+  const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      const reason = userError?.message || "No user session found";
+      console.error("User Fetch Error:", reason);
+      return {
+        error: `Auth Error: ${reason}`,
+        notifications: [],
+      };
+    }
 
   const formFields = {
     offline_id: formData.get("offline_id")?.toString(),
@@ -349,6 +362,7 @@ export const createOfflineAppointment = async (prev: any, formData: FormData) =>
     time: formData.get("time")?.toString(),
     notes: formData.get("notes")?.toString() || null,
     amount: Number(formData.get("amount")),
+    user_id : user.id,
   };
 
   const { data, error } = await supabase

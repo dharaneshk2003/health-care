@@ -320,19 +320,36 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
             </div>
           </div>
 
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <div className="flex items-start gap-3">
-              <div className="text-yellow-600 mt-0.5">
-                ℹ️
-              </div>
-              <div>
-                <h4 className="font-semibold text-yellow-800 mb-1">Rating Information</h4>
-                <p className="text-sm text-yellow-700">
-                  Your rating is based on patient reviews and feedback. It cannot be edited manually to maintain authenticity and trust.
-                </p>
-              </div>
-            </div>
-          </div>
+          <div className="space-y-4">
+  {/* Rating Info Note */}
+  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+    <div className="flex items-start gap-3">
+      <div className="text-yellow-600 mt-0.5 text-lg">ℹ️</div>
+      <div>
+        <h4 className="font-semibold text-yellow-800 mb-1">Rating Information</h4>
+        <p className="text-sm text-yellow-700">
+          Your rating is automatically based on patient feedback.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  {/* Update Profile Note */}
+  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+    <div className="flex items-start gap-3">
+      <div className="text-yellow-600 mt-0.5 text-lg">⚠️</div>
+      <div>
+        <h4 className="font-semibold text-yellow-800 mb-1">Important</h4>
+        <p className="text-sm text-yellow-700">
+          Please click the <span className="font-semibold underline">Update Profile</span> button first to save your information. 
+          After that, you can add your consultation details by clicking the 
+          <span className="font-semibold underline"> Add More Details</span> button.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
 
           <DialogFooter className="flex flex-col sm:flex-row gap-3">
             <Button

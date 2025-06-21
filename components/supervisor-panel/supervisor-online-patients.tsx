@@ -16,6 +16,13 @@ import { useToast } from "../../hooks/use-toast.ts"
 import { ToastAction } from "@/components/ui/toast"
 import { useRouter } from 'next/navigation';
 import { getUniqueDepartments } from "../../app/backend.ts"
+import { AlertCircleIcon, CheckCircle2Icon, PopcornIcon } from "lucide-react"
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert"
+import Link from 'next/link';
 export function SupervisorOnlinePatients({ list, departmentList }) {
   const router = useRouter();
   const randomSixDigit = Math.floor(Math.random() * (999999 - 111111 + 1)) + 111111;
@@ -99,7 +106,7 @@ export function SupervisorOnlinePatients({ list, departmentList }) {
         description: "New patient data has been updated.",
         action: <ToastAction altText="Undo">Undo</ToastAction>,
       });
-
+      //reload page
       setIsAddPatientOpen(false);
       window.location.reload();
       setTimeout(() => router.refresh(), 2000);
@@ -126,6 +133,18 @@ export function SupervisorOnlinePatients({ list, departmentList }) {
 
   return (
     <div className="space-y-6">
+      <Alert className="bg-yellow-100 text-yellow-800 border-yellow-400">
+        <AlertCircleIcon className="h-4 w-4 mr-2 text-yellow-700" />
+        <AlertTitle className="text-sm">
+              Add or edit the details in{' '}
+              <Link href="/profile">
+                <span className="font-bold underline text-yellow-900 hover:text-yellow-700 cursor-pointer">
+                  profile
+                </span>
+              </Link>{' '}
+              to register for consultation.
+        </AlertTitle>
+      </Alert>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Offline Appointment System</h1>
 
